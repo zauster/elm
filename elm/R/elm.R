@@ -1197,7 +1197,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         print(mydataBernoulli)
                     }
 
-            }
+            } ## if(k1 <= XROWS)
         else
             {
                 TYPEII_B <- Inf

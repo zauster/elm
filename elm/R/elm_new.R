@@ -1,5 +1,4 @@
 
-
 elm <- function(Y, X, some parameter)
     {
         for(coefficients)
