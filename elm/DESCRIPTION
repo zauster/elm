@@ -1,0 +1,14 @@
+Package: elm
+Type: Package
+Title: Exact linear regression
+Version: 0.1
+Date: 2013-11-17
+Authors@R: c(person(given = "Karl", family = "Schlag", 
+                    role = c("aut"),
+           email = "karl.schlag@univie.ac.at"), 
+           person(given = "Oliver", family = "Reiter", 
+                  role = c("cre", "ctb"),
+           email = "oliver.reiter@snapdragon.cc"))
+Description: Provides an implementation of exact tests for the coefficients of a linear regression.
+Depends: R (>= 2.10.0), stats, Rglpk, quadprog
+License: GPL-2
