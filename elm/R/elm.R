@@ -17,8 +17,25 @@ lambdamm <- 1
 monte <- 1000
 qq <- 0.0001 ##OLS (default=0.0001)
 qqmm <- 0.0001 ##MM (default=0.0001)
+elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 288)
 
-## elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 270)
+## step example
+n <- 400
+h <- 0.5
+Y <- sample(c(0, 1), size = n, replace = TRUE)
+X <- cbind(1, runif(n = n) < h)
+alpha <- 0.05
+IE <- "<="
+w1Y <- 0
+w2Y <- 1
+j <- 2
+betabarj = 0
+betaj1 = .13
+lambdamm <- 1
+monte <- 1000
+qq <- 0.0001 ##OLS (default=0.0001)
+qqmm <- 0.0001 ##MM (default=0.0001)
+elm(Y, X, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
 
 elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 betabarj = 0, betaj1 = betabarj + 1.1,
@@ -63,9 +80,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                     {
                         stop("you need to choose betaj1 > betabarj")
                     }
-            }
-        else if(IE == ">=")
-            {
+            } else if(IE == ">=") {
                 w11Y <- -w2Y
                 w22Y <- -w1Y
                 Y <- -1 * Y
@@ -77,9 +92,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                     {
                         stop("you need to choose betaj1 < betabarj")
                     }
-            }
-        else
-            {
+            } else {
                 stop("you need to choose IE either as <= or >=")
             }
 
@@ -137,9 +150,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                     {
                         Tau_jB[i] <- max(Tau_j[i]/TAUj_inf_min001,
                                          qq * TAUj_inf_min1)
-                    }
-                else
-                    {
+                    } else {
                         Tau_jB[i] <- min(Tau_j[i]/TAUj_inf_min001,
                                          -qq * TAUj_inf_min1)
                     }
@@ -159,9 +170,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                             det(DmatOLS)))
                 sigmasqbar_beta0jOLSvalue <- TAUj_2/4 - (1/XROWS) * (min(0, betabarj0-(1/2) * sum(Tau_j)))^2
 
-            }
-        else
-            {
+            } else {
                 sigmasqbar_beta0jOLSQP <- solve.QP(Dmat = DmatOLS,
                                                    dvec = dvecOLS, Amat,
                                                    bvec = bvec0, meq = 0,
@@ -212,9 +221,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         Bhattbar <- r$root
                     }
 
-            }
-        else
-            {
+            } else {
                 Bhattbar <- Inf
             }
 
@@ -234,9 +241,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(sigmasqbar_beta0jOLSvalue < 2 * (wb1[1])^2)
                     {
                         (R <- TAUj_inf * sigmasqbar_beta0jOLSvalue/(sigmasqbar_beta0jOLSvalue + (wb1[1])^2)^(3/2))
-                    }
-                else
-                    {
+                    } else {
                         (R <- 2 * TAUj_inf/((27^0.5) * wb1[1]))
                     }
                 htemp <- 1000 * (1 - pnorm((tbartemp - wb1[2])/(sigmasqbar_beta0jOLSvalue + wb1[1]^2)^0.5) + 0.56 * R)/pnorm(wb1[2]/wb1[1])
@@ -265,9 +270,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(BEtype1$value/1000 > alpha)
                     {
                         (BE <- FALSE)
-                    }
-                else
-                    {
+                    } else {
                         BEtbar <- tbartemp
                         ## print(BEtbar)
                         tbartemp <- tbartemp - grid
@@ -315,9 +318,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         cat("Nonstandardized test >>> REJECTS H_0\n\n")
                     }
                 RejectNonstandardizedOLS <- "YES"
-            }
-        else
-            {
+            } else {
                 if(printdetails)
                     {
                         cat("Non-standardized test does not reject H_0 \n\n")
@@ -331,9 +332,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
             {
                 sigmasqbar_betajOLSvalue <- TAUj_2/4 - (1/XROWS) * (betaj11-(1/2) * sum(Tau_j))^2
 
-            }
-        else
-            {
+            } else {
                 bvec1 <- as.vector(c(-betaj11,
                                      rep(ww, times = XROWS),
                                      rep(-(ww + 1), times = XROWS)))
@@ -372,15 +371,11 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(((Bhattbar^2)/sigmasqbar_betajOLSvalue) - Bhattbar * TAUj_inf/sigmasqbar_betajOLSvalue - 1 <= 0)
                     {
                         gOLStemp <- 1
-                    }
-                else
-                    {
+                    } else {
                         if(sigmasqbar_betajOLSvalue < (Bhattbar^2) * TAUj_inf/(TAUj_inf + 3 * Bhattbar))
                             {
                                 gOLStemp <- (3 * sigmasqbar_betajOLSvalue^2)/(4 * (sigmasqbar_betajOLSvalue^2) - 2 * sigmasqbar_betajOLSvalue * Bhattbar^2 + Bhattbar^4)
-                            }
-                        else
-                            {
+                            } else {
                                 gOLStemp <- ((3 * sigmasqbar_betajOLSvalue - TAUj_inf^2) * sigmasqbar_betajOLSvalue)/((3 * sigmasqbar_betajOLSvalue - TAUj_inf^2) * (sigmasqbar_betajOLSvalue + Bhattbar^2) + (Bhattbar^2 - Bhattbar * TAUj_inf - sigmasqbar_beta0jOLSvalue)^2)
                             }
                     }
@@ -393,9 +388,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(sigmasqbar_betajOLSvalue < 2 * (wb1[1])^2)
                     {
                         (R <- TAUj_inf * sigmasqbar_betajOLSvalue/(sigmasqbar_betajOLSvalue + (wb1[1])^2)^(3/2))
-                    }
-                else
-                    {
+                    } else {
                         (R <- 2 * TAUj_inf/((27^0.5) * wb1[1]))
                     }
                 htempOLS <- 1000 * (1 - pnorm(((betaj11 - betabarj0 - tbarmin) - wb1[2])/(sigmasqbar_betajOLSvalue + wb1[1]^2)^0.5) + 0.56 * R)/pnorm(wb1[2]/wb1[1])
@@ -556,9 +549,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                     {
                         Taumm_jB[i] <- max(Taumm_j[i]/TAUjmm_2_min,
                                            qqmm * TAUjmm_2_min)
-                    }
-                else
-                    {
+                    } else {
                         Taumm_jB[i] <- min(Taumm_j[i]/TAUjmm_2_min,
                                            -qqmm * TAUjmm_2_min)
                     }
@@ -573,9 +564,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 print(paste("Dmat not positive definite for MM, Det=",
                             det(Dmatmm)))
                 sigmasqbar_beta0jmmvalue <- TAUjmm_2/4 - (1/XROWS) * (min(0, betabarj0 - (1/2) * sum(Taumm_j)))^2
-            }
-        else
-            {
+            } else {
                 sigmasqbar_beta0jmmQP <- solve.QP(Dmat = Dmatmm, dvec = dvecmm,
                                                   Amat,
                                                   bvec = bvec0, meq = 0,
@@ -624,9 +613,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         Bhattbarmm <- r$root
                     }
 
-            }
-        else
-            {
+            } else {
                 Bhattbarmm <- Inf
             }
 
@@ -646,9 +633,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(sigmasqbar_beta0jmmvalue < 2 * (wb1[1])^2)
                     {
                         (R <- TAUj_inf * sigmasqbar_beta0jmmvalue/(sigmasqbar_beta0jmmvalue + (wb1[1])^2)^(3/2))
-                    }
-                else
-                    {
+                    } else {
                         (R <- 2 * TAUj_inf/((27^0.5) * wb1[1]))
                     }
                 hmmtemp = 1000 * (1-pnorm((tbartempmm-wb1[2])/(sigmasqbar_beta0jmmvalue + wb1[1]^2)^0.5) + 0.56 * R)/pnorm(wb1[2]/wb1[1])
@@ -673,9 +658,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(BEtype1$value/1000 > alpha)
                     {
                         (BE <- FALSE)
-                    }
-                else
-                    {
+                    } else {
                         BEtbar <- tbartemp
                         ## print(BEtbar)
                         tbartemp <- tbartemp - grid
@@ -706,9 +689,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(BEtype1mm$value/1000 > alpha)
                     {
                         (BE <- FALSE)
-                    }
-                else
-                    {
+                    } else {
                         BEtbarmm <- tbartempmm
                         ## print(BEtbarmm)
                         tbartempmm <- tbartempmm - grid
@@ -763,9 +744,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         cat("Nonstandardized test >>> REJECTS H_0\n\n")
                     }
                 RejectNonstandardizedmm <- "YES"
-            }
-        else
-            {
+            } else {
                 if(printdetails)
                     {
                         cat("Non-standardized test does not reject H_0\n\n")
@@ -777,9 +756,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         if(det(Dmatmm) <= zero)
             {
                 sigmasqbar_betajmmvalue <- TAUjmm_2/4-(1/XROWS) * (betaj11-(1/2) * sum(Taumm_j))^2
-            }
-        else
-            {
+            } else {
                 bvec1 <- as.vector(c(-betaj11, rep(ww, times = XROWS),
                                      rep(-(ww + 1), times = XROWS)))
 
@@ -797,15 +774,11 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(((Bhattbar^2)/sigmasqbar_betajmmvalue) - Bhattbar * TAUjmm_inf/sigmasqbar_betajmmvalue - 1 <=0)
                     {
                         gmmtemp <- 1
-                    }
-                else
-                    {
+                    } else {
                         if(sigmasqbar_betajmmvalue < (Bhattbar^2) * TAUjmm_inf/(TAUjmm_inf + 2 * Bhattbar))
                             {
                                 gmmtemp <- (3 * sigmasqbar_betajmmvalue^2)/(4 * (sigmasqbar_betajmmvalue^2) - 2 * sigmasqbar_betajmmvalue * Bhattbar^2 + Bhattbar^4)
-                            }
-                        else
-                            {
+                            } else {
                                 gmmtemp <- ((3 * sigmasqbar_betajmmvalue - TAUjmm_inf^2) * sigmasqbar_betajmmvalue)/((3 * sigmasqbar_betajmmvalue - TAUjmm_inf^2) * (sigmasqbar_betajmmvalue + Bhattbar^2) + (Bhattbar^2 - Bhattbar * TAUjmm_inf - sigmasqbar_beta0jmmvalue)^2)
                             }
                     }
@@ -817,16 +790,11 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(((Bhattbar^2)/sigmasqbar_betajOLSvalue) - Bhattbar * TAUj_inf/sigmasqbar_betajOLSvalue - 1 <=0)
                     {
                         gOLStemp <- 1
-                    }
-
-                else
-                    {
+                    } else {
                         if(sigmasqbar_betajOLSvalue < (Bhattbar^2) * TAUj_inf/(TAUj_inf + 3 * Bhattbar))
                             {
                                 gOLStemp <- (3 * sigmasqbar_betajOLSvalue^2)/(4 * (sigmasqbar_betajOLSvalue^2) - 2 * sigmasqbar_betajOLSvalue * Bhattbar^2 + Bhattbar^4)
-                            }
-                        else
-                            {
+                            } else {
                                 gOLStemp <- ((3 * sigmasqbar_betajOLSvalue - TAUj_inf^2) * sigmasqbar_betajOLSvalue)/((3 * sigmasqbar_betajOLSvalue - TAUj_inf^2) * (sigmasqbar_betajOLSvalue + Bhattbar^2) + (Bhattbar^2 - Bhattbar * TAUj_inf - sigmasqbar_beta0jOLSvalue)^2)
                             }
                     }
@@ -838,9 +806,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(sigmasqbar_betajmmvalue < 2 * (wb1[1])^2)
                     {
                         (R <- TAUj_inf * sigmasqbar_betajmmvalue/(sigmasqbar_betajmmvalue + (wb1[1])^2)^(3/2))
-                    }
-                else
-                    {
+                    } else {
                         (R <- 2 * TAUj_inf/((27^0.5) * wb1[1]))
                     }
                 htempmm <- 1000 * (1 - pnorm(((betaj11 - betabarj0 - tbarminmm) - wb1[2])/(sigmasqbar_betajmmvalue + wb1[1]^2)^0.5) + 0.56 * R)/pnorm(wb1[2]/wb1[1])
@@ -1039,10 +1005,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
 
         ## much faster than commented code above:
         W <- sapply(1:XROWS, function(x) rbinom(n = monte, size = 1, p1[x]))
-        Wbars <- rowMeans(W1)
-
-
-
+        Wbars <- rowMeans(W)
 
         pbar = (betabarj0 + ds - a)/(b - a)
 
@@ -1076,9 +1039,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         if(kbar/XROWS <= pbar)
                             {
                                 TYPEIIbernoullitemp <- 1
-                            }
-                        else
-                            {
+                            } else {
                                 TYPEIIbernoullitemp <- (1 - Bkp(kbar, (betaj + ds - a)/(b - a)))/(1 - theta)
                             }
                         TYPEIIbernoullitemp
@@ -1091,17 +1052,19 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
 
                 while(Bkp(kk, pbar)/alpha > 0.05 )
                     {
-
                         alphabar <- Bkp(kk, pbar)
                         theta <- alphabar/alpha
                         kbar <- kk
-                        ## print(theta)
-                        ## print(TYPEIIbernoulli(betaj11))
+                        print(kbar)
+                        print(theta)
+                        print(TYPEIIbernoulli(betaj11))
 
                         if(TYPEIIbernoulli(betaj11) < TYPEII_B)
                             {
                                 TYPEII_B <- TYPEIIbernoulli(betaj11)
-                                kb <- kbar ##value of kbar to remember for below
+                                kb <- kbar ##value of kbar to remember
+                                ##for below
+                                print(paste("kb: ", kb))
 
                             }
                         kk <- kk + 1
@@ -1168,9 +1131,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                                             exp(-2 * monte * (mean(r_alphaprimeWbars) - theta)^2))
                                     }
                                 RejectBernoulliOLS <- "YES"
-                            }
-                        else
-                            {
+                            } else {
                                 if(printdetails)
                                     {
                                         cat("does not reject H0, rejection probability of randomized test =",
@@ -1197,9 +1158,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         print(mydataBernoulli)
                     }
 
-            } ## if(k1 <= XROWS)
-        else
-            {
+            } else {
                 TYPEII_B <- Inf
                 if(printdetails)
                     {
@@ -1291,7 +1250,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         ##     }
         ## much faster than commented code above:
         Wmm <- sapply(1:XROWS, function(x) rbinom(n = monte, size = 1, p1mm[x]))
-        Wbars <- rowMeans(W1)
+        Wbarsmm <- rowMeans(Wmm)
 
         pbarmm <- (betabarj0 + dsmm - a)/(bmm - a)
 
@@ -1312,9 +1271,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         if(kbarmm/XROWS <= pbarmm)
                             {
                                 TYPEIIbernoullitempmm <- 1
-                            }
-                        else
-                            {
+                            } else {
                                 TYPEIIbernoullitempmm <- (1 - Bkp(kbarmm, (betaj + dsmm - a)/(bmm - a)))/(1 - thetamm)
                             }
                         TYPEIIbernoullitempmm
@@ -1352,13 +1309,9 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         if(XROWS * Wbar >= kbarmm)
                             {
                                 r_alphaprimeWbartempmm <- 1
-                            }
-                        else if(XROWS * Wbar == kbarmm-1)
-                            {
+                            } else if(XROWS * Wbar == kbarmm-1) {
                                 r_alphaprimeWbartempmm <- (alphabarmm - Bkp(kbarmm, pbarmm))/(Bkp(kbarmm - 1, pbarmm) - Bkp(kbarmm, pbarmm))
-                            }
-                        else
-                            {
+                            } else {
                                 r_alphaprimeWbartempmm <- 0
                             }
                         r_alphaprimeWbartempmm
@@ -1395,9 +1348,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                                             exp(-2 * monte * (mean(r_alphaprimeWbarsmm) - thetamm)^2))
                                     }
                                 RejectBernoullimm <- "YES"
-                            }
-                        else
-                            {
+                            } else {
                                 if(printdetails)
                                     {
                                         cat("does not reject H0, rejection probability of randomized test =",
@@ -1424,9 +1375,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         print(mydataBernoullimm)
                     }
 
-            }
-        else
-            {
+            } else {
                 TYPEII_Bmm <- Inf
                 if(printdetails)
                     {
@@ -1476,15 +1425,11 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(IE == "<=")
                     {
                         cat("betaj1 needs to be made larger")
-                    }
-                else
-                    {
+                    } else {
                         cat("betaj1 needs to be made smaller")
                     }
                 cat("\n")
-            }
-        else
-            {
+            } else {
                 if(min(TYPEIINonstandardizedOLS,
                        TYPEIINonstandardizedmm,
                        TYPEII_B, TYPEII_Bmm) == TYPEIINonstandardizedOLS)
@@ -1620,9 +1565,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(IE == "<=")
                     {
                         cat("...... decrease betaj1 to get type II closer to 0.5 \n")
-                    }
-                else
-                    {
+                    } else {
                         cat("...... increase betaj1 to get type II closer to 0.5 \n")
                     }
             }
@@ -1633,9 +1576,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 if(IE == "<=")
                     {
                         cat("...... increase betaj1 (if possible) to get type II closer to 0.5 \n")
-                    }
-                else
-                    {
+                    } else {
                         cat("...... decrease betaj1 (if possible) to get type II closer to 0.5 \n")
                     }
             }
@@ -1662,28 +1603,28 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         MMNrBernoulli <- list() ## Nonrandomized Bernoulli Test MM
         ## Parameter
 
-        parameter <- list(n = XROWS,
-                          m = XCOLS,
-                          j = cj,
-                          alternative = IE,
-                          alpha = alpha,
-                          bounds = bounds,
-                          iterations = monte)
+        ## parameter <- list(n = XROWS,
+        ##                   m = XCOLS,
+        ##                   j = cj,
+        ##                   alternative = IE,
+        ##                   alpha = alpha,
+        ##                   bounds = bounds,
+        ##                   iterations = monte)
 
-        structure(list(method = method,
-                       yname = YNAME,
-                       xname = XNAME,
-                       parameter = parameter,
-                       coef = cj,
-                       betabarj = betabarj,
-                       betahatj = betahatj,
-                       chosentest = chosentest,
-                       estimator = estimator,
-                       typeII = typeII,
-                       theta = theta,
-                       rejection = rejection,
-                       bounds = bounds,
-                       theta = theta),
-                  class = "elm")
+        ## structure(list(method = method,
+        ##                yname = YNAME,
+        ##                xname = XNAME,
+        ##                parameter = parameter,
+        ##                coef = cj,
+        ##                betabarj = betabarj0,
+        ##                ## betahatj = betahatj,
+        ##                chosentest = chosentest,
+        ##                estimator = estimator,
+        ##                typeII = typeII,
+        ##                theta = theta,
+        ##                rejection = rejection,
+        ##                bounds = bounds,
+        ##                theta = theta),
+        ##           class = "elm")
 
     }
