@@ -55,7 +55,7 @@ calcNonstandardizedTest <- function(TAUj_2, TAUj_inf, alpha,
         BEtype1 <- optim(wb1start, minBerryEsseenbound, gr = NULL,
                          sigmasqbar = sigmasqbar,
                          TAUj_inf = TAUj_inf,
-                         tbartemp = tbartemp, ## start with Hoeffding bound
+                         tbar = tbartemp, ## start with Hoeffding bound
                          method = "L-BFGS-B",
                          lower = lowerBE, upper = c(10, 10))
         ## control = list(fnscale = 1))
@@ -65,7 +65,7 @@ calcNonstandardizedTest <- function(TAUj_2, TAUj_inf, alpha,
                 BEtype1 <- optim(wb1start, minBerryEsseenbound, gr = NULL,
                                  sigmasqbar = sigmasqbar,
                                  TAUj_inf = TAUj_inf,
-                                 tbartemp = tbartemp, ## start with Hoeffding bound
+                                 tbar = tbartemp, ## start with Hoeffding bound
                                  method = "L-BFGS-B",
                                  lower = lowerBE, upper = c(10, 10))
 
@@ -100,17 +100,31 @@ minBerryEsseenbound <- function(wb, sigmasqbar, TAUj_inf, tbar)
         res
     }
 
+calcBhattacharyya <- function(Bhattbar, sigmasqbar, TAUj_inf)
+    {
+        if(((Bhattbar^2)/sigmasqbar) - Bhattbar * TAUj_inf/sigmasqbar - 1 <= 0)
+            {
+                gOLStemp <- 1
+            } else {
+                if(sigmasqbar < (Bhattbar^2) * TAUj_inf/(TAUj_inf + 3 * Bhattbar))
+                    {
+                        gOLStemp <- (3 * sigmasqbar^2)/(4 * (sigmasqbar^2) - 2 * sigmasqbar * Bhattbar^2 + Bhattbar^4)
+                    } else {
+                        gOLStemp <- ((3 * sigmasqbar - TAUj_inf^2) * sigmasqbar)/((3 * sigmasqbar - TAUj_inf^2) * (sigmasqbar + Bhattbar^2) + (Bhattbar^2 - Bhattbar * TAUj_inf - sigmasqbar_beta0jOLSvalue)^2)
+                    }
+            }
+        gOLStemp
+    }
+
+
 
 ## TypeII of the Nonstandardized test
-calcTypeIINonstandardized <- function(wb1start = c(0.1, 0.1),
-                                  ## hOLS = hOLS,
-                                  lowerBE = rep(10^-6, 2),
-                                  sigmasqbar = 2533,
-                                  betaj = -270,
-                                  betabarj = -100,
-                                  tbarmin = 134.7,
-                                  ## gOLS = gOLS,
-                                  TAUj_2 = 12858,
+calcTypeIINonstandardized <- function(wb1start, lowerBE,
+                                      sigmasqbar,
+                                      betaj,
+                                      betabarj,
+                                      tbarmin,
+                                      TAUj_2,
                                       TAUj_inf)
     ## should work for OLS and MM (I see no differences)
     {
@@ -131,7 +145,9 @@ calcTypeIINonstandardized <- function(wb1start = c(0.1, 0.1),
         typeII[2] <- (sigmasqbar)/(sigmasqbar + (betaj - betabarj - tbarmin)^2)
 
         ## Bhattacharyya
-        typeII[3] <- gOLS(betaj - betabarj - tbarmin)
+        typeII[3] <- calcBhattacharyya(betaj - betabarj - tbarmin,
+                                       sigmasqbar = sigmasqbar,
+                                       TAUj_inf = TAUj_inf)
 
         ## Hoeffding
         typeII[4] <- exp(-2 * (betaj - betabarj - tbarmin)^2/TAUj_2)

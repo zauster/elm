@@ -4,38 +4,44 @@ library(Rlab)
 data(golf)
 Y <- matrix(golf$score)
 X <- cbind(1, as.matrix(golf[, -1]))
-printdetails <- T
-IE <- "<="
-alpha <- 0.05
-j <- 1
-betabarj <- 100
-betaj1 <- betabarj + 170
-w1Y <- 60
-w2Y <- 80
-lambda <- 1
-lambdamm <- 1
-monte <- 1000
-qq <- 0.0001 ##OLS (default=0.0001)
-qqmm <- 0.0001 ##MM (default=0.0001)
-elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 288)
+## printdetails <- T
+## IE <- "<="
+## alpha <- 0.05
+## j <- 1
+## betabarj <- 100
+## betaj1 <- betabarj + 170
+## w1Y <- 60
+## w2Y <- 80
+## lambda <- 1
+## lambdamm <- 1
+## monte <- 1000
+## qq <- 0.0001 ##OLS (default=0.0001)
+## qqmm <- 0.0001 ##MM (default=0.0001)
+elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 284)
 
 ## step example
 n <- 400
 h <- 0.5
-Y <- sample(c(0, 1), size = n, replace = TRUE)
-X <- cbind(1, runif(n = n) < h)
-alpha <- 0.05
-IE <- "<="
-w1Y <- 0
-w2Y <- 1
-j <- 2
-betabarj = 0
-betaj1 = .13
-lambdamm <- 1
-monte <- 1000
-qq <- 0.0001 ##OLS (default=0.0001)
-qqmm <- 0.0001 ##MM (default=0.0001)
-elm(Y, X, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
+YY <- sample(c(0, 1), size = n, replace = TRUE)
+XX <- cbind(1, runif(n = n) < h)
+## alpha <- 0.05
+## Given Y=X*beta+error where there are no assumptions imposed on the
+## errors, it tests the one sided
+## hypothesis H0: betaj<=betabarj against H1: betaj>betabarj where j
+## is index of coefficient.
+## It also tests H0: betaj>=betabarj against H1: betaj<betabarj.
+
+## IE <- "<="
+## w1Y <- 0
+## w2Y <- 1
+## j <- 2
+## betabarj = 0
+## betaj1 = .13
+## lambdamm <- 1
+## monte <- 1000
+## qq <- 0.0001 ##OLS (default=0.0001)
+## qqmm <- 0.0001 ##MM (default=0.0001)
+elm(YY, XX, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
 
 elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 betabarj = 0, betaj1 = betabarj + 1.1,
@@ -119,7 +125,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         ## names(mydatainitial) <- c(" ", "Data input")
         ## if(printdetails)
         ##     {
-        ##         print(mydatainitial)
+                ## print(mydatainitial)
         ##         cat("stop 1")
         ##     }
 
@@ -640,6 +646,19 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 hmmtemp
             }
 
+        h <- function(wb1)
+            {
+                if(sigmasqbar_beta0jOLSvalue < 2 * (wb1[1])^2)
+                    {
+                        (R <- TAUj_inf * sigmasqbar_beta0jOLSvalue/(sigmasqbar_beta0jOLSvalue + (wb1[1])^2)^(3/2))
+                    } else {
+                        (R <- 2 * TAUj_inf/((27^0.5) * wb1[1]))
+                    }
+                htemp <- 1000 * (1 - pnorm((tbartemp - wb1[2])/(sigmasqbar_beta0jOLSvalue + wb1[1]^2)^0.5) + 0.56 * R)/pnorm(wb1[2]/wb1[1])
+                htemp
+            }
+
+
         ## xxx: same as above?
         BEtype1 <- optim(wb1start, h, gr = NULL,
                          method = "L-BFGS-B",
@@ -982,11 +1001,11 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         ## j <- 1
         ## while(j <= monte)
         ##     {
-        ##         ## print(paste("j:", j))
+                ## print(paste("j:", j))
         ##         for(i in 1:XROWS)
         ##             {
-        ##                 ## print(paste("i:", i))
-        ##                 ## print(paste("i + (j - 1):", i + (j - 1)* XROWS))
+                        ## print(paste("i:", i))
+                        ## print(paste("i + (j - 1):", i + (j - 1)* XROWS))
         ##                 W[i + (j - 1) * XROWS] <- rbinom(1, size = 1, p1[i])
         ##                 ## W[i + (j-1) * XROWS] <- rbern(1, p1[i])
         ##             }
@@ -998,7 +1017,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         ##     {
         ##         temp1 <-  (i - 1) * XROWS + 1
         ##         temp2 <- i * XROWS
-        ##         ## print(paste("from", temp1, "to", temp2))
+                ## print(paste("from", temp1, "to", temp2))
         ##         Wbars[i] <- mean(W[temp1:temp2])
         ##         i <- i + 1
         ##     }
@@ -1055,19 +1074,20 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                         alphabar <- Bkp(kk, pbar)
                         theta <- alphabar/alpha
                         kbar <- kk
-                        print(kbar)
-                        print(theta)
-                        print(TYPEIIbernoulli(betaj11))
+                        ## print(paste("kbar: ", kbar))
+                        ## print(paste("theta", theta))
+                        ## print(paste("typeII: ", TYPEIIbernoulli(betaj11)))
 
                         if(TYPEIIbernoulli(betaj11) < TYPEII_B)
                             {
                                 TYPEII_B <- TYPEIIbernoulli(betaj11)
                                 kb <- kbar ##value of kbar to remember
                                 ##for below
-                                print(paste("kb: ", kb))
+                                ## print(paste("kb: ", kb))
 
                             }
                         kk <- kk + 1
+                        ## print(paste("k1: ", kk))
                     }
 
                 kbar <- kb

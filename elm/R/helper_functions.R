@@ -1,48 +1,58 @@
-
-## TypeII of the Nonstandardized test
-TypeIINonstandardized <- function(wb1start = c(0.1, 0.1),
-                                  ## hOLS = hOLS,
-                                  lowerBE = rep(10^-6, 2),
-                                  sigmasqbar_betajOLSvalue = 2533,
-                                  betaj11 = -270,
-                                  betabarj0 = -100,
-                                  tbarmin = 134.7,
-                                  ## gOLS = gOLS,
-                                  TAUj_2 = 12858)
-    ## should work for OLS and MM (I see no differences)
+## calculate sigmasqbar-variants (one for the typeI, one for typeII)
+calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
+                           Tau_jB,
+                           TAUj_2, Tau_j,
+                           betabarj, betaj1,
+                           zero = 10^-12)
     {
-        typeII <- rep(1, 5)
-        names(typeII) <- c("Berry-Esseen", "Cantelli", "Bhattacharyya",
-                           "Hoeffding", "Pinelis")
+        sigmasqbar <- vector(length = 2)
+        names(sigmasqbar) <- c("TypeI", "TypeII")
 
-        ## Berry-Esseen
-        typeII[1] <- optim(wb1start, hOLS, gr = NULL,
-                           method = "L-BFGS-B",
-                           lower = lowerBE, upper = c(10,10),
-                           control = list(fnscale = 1))$value/1000
+        Dmat <- 2 * t(X) %*% ((Tau_jB^2) * X)
+        dvec <- (1 + 2 * ww) * colMeans((Tau_jB^2) * X) * XROWS
+        Amat <- t(matrix(rbind(-t(ej), X, -X), ncol = XCOLS))
 
-        ## Cantelli
-        typeII[2] <- (sigmasqbar_betajOLSvalue)/(sigmasqbar_betajOLSvalue + (betaj11 - betabarj0 - tbarmin)^2)
+        if(det(Dmat) <= zero)
+            {
+                ## typeI
+                term1 <- min(0, betabarj - (1/2) * sum(Tau_j))
+                sigmasqbar[1] <- TAUj_2/4 - (1/XROWS) * (term1)^2
 
-        ## Bhattacharyya
-        typeII[3] <- gOLS(betaj11 - betabarj0 - tbarmin)
+                ## typeII
+                term1 <- betaj1 - (1/2) * sum(Tau_j)
+                sigmasqbar[2] <- TAUj_2/4 - (1/XROWS) * (term1)^2
+            } else {
+                ## typeI
+                bvec <- as.vector(c(-betabarj,
+                                    rep(ww, times = XROWS),
+                                    rep(-(ww + 1), times = XROWS)))
+                meq <- 0
+                zsol <- solve.QP(Dmat = Dmat,
+                                 dvec = dvec,
+                                 Amat,
+                                 bvec = bvec, meq = meq,
+                                 factorized = FALSE)$solution
+                sigmasqbar[1] <- sum((Tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
 
-        ## Hoeffding
-        typeII[4] <- exp(-2 * (betaj11 - betabarj0 - tbarmin)^2/TAUj_2)
-
-        ## Pinelis
-        typeII[5] <- factorial(5) * (exp(1)/5)^5 * (1 - pnorm(2 * (betaj11 - betabarj0 - tbarmin)/sqrt(TAUj_2)))
-
-        typeII[typeII > 1] <- 1
-
-        return(typeII)
-    }
-
-findOptimalBetajTypeIINonstandardized <- function(betaj)
-    {
-        typeII <- TypeIINonstandardized(wb1start, lowerBE,
-                                        sigmasqbar_betajOLSvalue,
-                                        betaj11 = betaj, betabarj0,
-                                        tbarmin, TAUj_2)
-        return(typeII[which.min(typeII)] - 0.5)
+                ## typeII
+                c2 <- 1/max(Dmat) ## NEW
+                bvec <- as.vector(c(-betaj1,
+                                    rep(ww, times = XROWS),
+                                    rep(-(ww + 1), times = XROWS)))
+                meq <- 1
+                zsol <- solve.QP(Dmat = c2 * Dmat,
+                                 dvec = c2 * dvec,
+                                 Amat,
+                                 bvec = bvec, meq = meq,
+                                 factorized = FALSE)$solution
+                ## if there is an error message
+                ## Fehler in solve.QP(Dmat = c2 * DmatOLS, dvec = c2 * dvecOLS, Amat = Amat,  :
+                ##  constraints are inconsistent, no solution!
+                ## then this often results to numerical problems when solving (2) in
+                ## (Gossner and Schlag, 2013)
+                ## but can also come if betaj1 is not close enough to
+                ## 0
+                sigmasqbar[2] <- sum((Tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
+            }
+        sigmasqbar
     }
