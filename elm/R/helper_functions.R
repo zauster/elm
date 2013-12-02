@@ -2,7 +2,7 @@
 calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                            Tau_jB,
                            TAUj_2, Tau_j,
-                           betabarj, betaj1,
+                           betabarj, betaj,
                            zero = 10^-12)
     {
         sigmasqbar <- vector(length = 2)
@@ -19,7 +19,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                 sigmasqbar[1] <- TAUj_2/4 - (1/XROWS) * (term1)^2
 
                 ## typeII
-                term1 <- betaj1 - (1/2) * sum(Tau_j)
+                term1 <- betaj - (1/2) * sum(Tau_j)
                 sigmasqbar[2] <- TAUj_2/4 - (1/XROWS) * (term1)^2
             } else {
                 ## typeI
@@ -36,7 +36,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
 
                 ## typeII
                 c2 <- 1/max(Dmat) ## NEW
-                bvec <- as.vector(c(-betaj1,
+                bvec <- as.vector(c(-betaj,
                                     rep(ww, times = XROWS),
                                     rep(-(ww + 1), times = XROWS)))
                 meq <- 1
@@ -50,7 +50,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                 ##  constraints are inconsistent, no solution!
                 ## then this often results to numerical problems when solving (2) in
                 ## (Gossner and Schlag, 2013)
-                ## but can also come if betaj1 is not close enough to
+                ## but can also come if betaj is not close enough to
                 ## 0
                 sigmasqbar[2] <- sum((Tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
             }

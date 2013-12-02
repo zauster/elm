@@ -1,13 +1,50 @@
+##
+## non-verbose:
+##
+##        Exact linear models
+##
+## data: Y and X
+##
+## Tested coefficients:
+##        H_0     Estimate     Threshold    Test statistic
+## weight > 0         1.23          0.23              0.08
+##                             Rejection       chosen Test
+##                                    No         Bernoulli
+##
+##        H_0     Estimate     Threshold    Test statistic
+## gender > 0         3.89          12.5              18.4
+##                             Rejection       chosen Test
+##                                   Yes         Hoeffding
+##
+## parameter:
+##    Y in [0, 10]
+##    alpha: 0.05
+##    iterations: 1000
 
-##        SUMMARY RESULTS, n= 195 m= 7  Y range [ 60 , 80 ]
-## 1 Estimated coefficient of beta 1 :             55.25884
-## 2        Reject H0: beta 1 <= 100 ? NO  at alpha =  0.05
-## 3                         based on:            Bernoulli
-## 4                        Estimator:              Minimax
-## 5                            theta:              0.24519
-## 6 Type II bound for beta 1 >= 270 :              0.63771
+## verbose:
+##        Exact linear models
+##
+## data: Y and X
+##
+## Tested coefficients:
+##         H_0     Estimate     Threshold    Test statistic
+## weight <= 0         1.23          0.23              0.08
+##                              Rejection       chosen Test
+##                                     No         Bernoulli
+##       betaj         Test     Threshold            TypeII
+##        1.42    Bernoulli          0.23              0.50
+##        1.42    Hoeffding          3.44              0.54
+##        1.42     Cantelli         13.93              0.56
+##        ...
+##
+##
+## parameter:
+##    Y in [0, 10]
+##    alpha: 0.05
+##    iterations: 1000
 
-print.elm <- function(x, digits = 5)
+
+print.elm <- function(x, ..., digits = 5)
     {
         cat("\n")
         cat(strwrap(x$method, prefix = "\t"), sep="\n")

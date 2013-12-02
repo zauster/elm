@@ -1,6 +1,5 @@
 \name{elm-package}
 \alias{elm-package}
-\alias{elm}
 \docType{package}
 \title{
 Exact linear models
@@ -23,7 +22,7 @@ License: \tab GPL-2\cr
 Karl Schlag, Olivier Gossner, Gareth Liu-Evans and Oliver Reiter
 }
 \references{
-Schlag, K. and Gossner, O. (2013), "Finite-Sample Exact Tests for Linear Regressions with Bounded Dependent Variables", Journal of Econometrics (forthcoming). 
+Olivier Gossner, Karl H. Schlag, "Finite-sample exact tests for linear regressions with bounded dependent variables", Journal of Econometrics, Volume 177, Issue 1, November 2013, Pages 75-84, ISSN 0304-4076, \url{http://dx.doi.org/10.1016/j.jeconom.2013.06.003}.
 }
 \seealso{
   \url{http://homepage.univie.ac.at/karl.schlag/research/statistics/}

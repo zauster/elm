@@ -1,3 +1,4 @@
 export("elm")
 
-## S3 Method maybe
+## S3 Method
+S3method("print", "elm")

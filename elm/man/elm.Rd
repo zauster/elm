@@ -7,10 +7,10 @@ Exact linear models
   Uses exact tests for the coefficients of linear regressions.
 }
 \usage{
-elm(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
-    betabarj = 0, betaj1 = betabarj + 1.1,
-    lambda = 1, lambdamm = 1, monte = 1000,
-    qq = 1e-04, qqmm = 1e-04, printdetails = TRUE)
+elm(Y, X, lower = 0, upper = 1, alternative = "greater",
+    alpha = 0.05, j = 2, betabarj = 0, betaj = 0.5,
+    lambda = 1, lambdamm = 1, iterations = 1000,
+    qq = 0.0001, qqmm = 0.0001)
 }
 
 \arguments{
@@ -20,11 +20,11 @@ elm(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
   \item{X}{
     independent variable, as matrix.
 }
-  \item{w1Y, w2Y}{
+  \item{lower, upper}{
     the theoretical lower and upper bounds on the data outcomes known ex-ante before gathering the data.
 }
-  \item{IE}{
-    the hypothesis to be tested, ">=" or "<=" (default).
+  \item{alternative}{
+    the hypothesis to be tested, "less" or "greater" (default).
 }
   \item{alpha}{
     the type I error.
@@ -35,7 +35,7 @@ elm(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
   \item{betabarj}{
     the critical value for the null hypothesis
 }
-  \item{betaj1}{
+  \item{betaj}{
     value of the coefficient under the alternative. to bring the type II
   error to 0.5
 }
@@ -45,7 +45,7 @@ elm(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
   \item{lambdamm}{
 %%     ~~Describe \code{lambdamm} here~~
 }
-  \item{monte}{
+  \item{iterations}{
     number of iterations
 }
   \item{qq}{
@@ -54,12 +54,11 @@ elm(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
   \item{qqmm}{
 %%     ~~Describe \code{qqmm} here~~
 }
-  \item{printdetails}{
-    logical, should details of the tests be printed out?
-}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  This function computes several exact tests for the coefficient of a
+  linear regression. For an explanation as to how the tests are
+  constructed, please refer to the paper mentioned below.
 }
 \value{
 %%  ~Describe the value returned
@@ -69,23 +68,26 @@ elm(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+Olivier Gossner, Karl H. Schlag, "Finite-sample exact tests for linear regressions with bounded dependent variables", Journal of Econometrics, Volume 177, Issue 1, November 2013, Pages 75-84, ISSN 0304-4076, \url{http://dx.doi.org/10.1016/j.jeconom.2013.06.003}.
 }
 \author{
-%%  ~~who you are~~
+Karl Schlag, Olivier Gossner, Gareth Liu-Evans and Oliver Reiter
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+%% \note{
+%% %%  ~~further notes~~
+%% }
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \url{http://homepage.univie.ac.at/karl.schlag/research/statistics.html}
 }
 \examples{
+## step example
+n <- 40
+h <- 0.5
+Y <- sample(c(0, 1), size = n, replace = TRUE)
+X <- cbind(1, runif(n = n) < h)
+elm(Y, X, 0, 1, j = 2, betabarj = 0, betaj = .43)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{}
+\keyword{linear regression}
+\keyword{exact method}
 

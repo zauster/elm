@@ -110,7 +110,7 @@ calcBhattacharyya <- function(Bhattbar, sigmasqbar, TAUj_inf)
                     {
                         gOLStemp <- (3 * sigmasqbar^2)/(4 * (sigmasqbar^2) - 2 * sigmasqbar * Bhattbar^2 + Bhattbar^4)
                     } else {
-                        gOLStemp <- ((3 * sigmasqbar - TAUj_inf^2) * sigmasqbar)/((3 * sigmasqbar - TAUj_inf^2) * (sigmasqbar + Bhattbar^2) + (Bhattbar^2 - Bhattbar * TAUj_inf - sigmasqbar_beta0jOLSvalue)^2)
+                        gOLStemp <- ((3 * sigmasqbar - TAUj_inf^2) * sigmasqbar)/((3 * sigmasqbar - TAUj_inf^2) * (sigmasqbar + Bhattbar^2) + (Bhattbar^2 - Bhattbar * TAUj_inf - sigmasqbar)^2)
                     }
             }
         gOLStemp
@@ -160,11 +160,11 @@ calcTypeIINonstandardized <- function(wb1start, lowerBE,
         return(typeII)
     }
 
-findOptimalBetajTypeIINonstandardized <- function(betaj)
-    {
-        typeII <- calcTypeIINonstandardized(wb1start, lowerBE,
-                                        sigmasqbar,
-                                        betaj = betaj, betabarj,
-                                        tbarmin, TAUj_2)
-        return(typeII[which.min(typeII)] - 0.5)
-    }
+## findOptimalBetajTypeIINonstandardized <- function(betaj)
+##     {
+##         typeII <- calcTypeIINonstandardized(wb1start, lowerBE,
+##                                         sigmasqbar,
+##                                         betaj = betaj, betabarj,
+##                                         tbarmin, TAUj_2)
+##         return(typeII[which.min(typeII)] - 0.5)
+##     }

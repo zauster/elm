@@ -3,16 +3,16 @@
 calcBernoulliTest <- function(Y, XROWS, TAUj_inf, Tau_j,
                               ww, kbar, pbar, alphabar,
                               d, ds, b, a = 0,
-                              betaj1, betabarj, alternative, iterations,
+                              betaj, betabarj, alternative, iterations,
                               theta, lambda = 1)
     {
-        if(((betaj1 + ds - a)/(b - a) > 1) & (alternative == "greater"))
+        if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
             {
-                stop(paste("betaj1 is too large, has to be <= ", round(b - ds, digits = 5)))
+                stop(paste("betaj is too large, has to be <= ", round(b - ds, digits = 5)))
             }
-        if(((betaj1 + ds - a)/(b - a) > 1) & (alternative == "less"))
+        if(((betaj + ds - a)/(b - a) > 1) & (alternative == "less"))
             {
-                stop(paste("betaj1 is too small, has to be >= ", round(ds - b, digits = 5)))
+                stop(paste("betaj is too small, has to be >= ", round(ds - b, digits = 5)))
             }
 
         Z <- XROWS * (Tau_j * Y + d)
