@@ -119,7 +119,8 @@ calcBhattacharyya <- function(Bhattbar, sigmasqbar, TAUj_inf)
 
 
 ## TypeII of the Nonstandardized test
-calcTypeIINonstandardized <- function(wb1start, lowerBE,
+calcTypeIINonstandardized <- function(wb1start,
+                                      lowerBE,
                                       sigmasqbar,
                                       betaj,
                                       betabarj,
@@ -132,30 +133,33 @@ calcTypeIINonstandardized <- function(wb1start, lowerBE,
         names(typeII) <- c("Berry-Esseen", "Cantelli", "Bhattacharyya",
                            "Hoeffding", "Pinelis")
 
-        ## Berry-Esseen
-        typeII[1] <- optim(wb1start, minBerryEsseenbound, gr = NULL,
-                           sigmasqbar = sigmasqbar,
-                           TAUj_inf = TAUj_inf,
-                           tbar = betaj - betabarj - tbarmin,
-                           method = "L-BFGS-B",
-                           lower = lowerBE, upper = c(10,10),
-                           control = list(fnscale = 1))$value/1000
+        if(betaj > betabarj + tbarmin)
+            {
+                ## Berry-Esseen
+                typeII[1] <- optim(wb1start, minBerryEsseenbound, gr = NULL,
+                                   sigmasqbar = sigmasqbar,
+                                   TAUj_inf = TAUj_inf,
+                                   tbar = betaj - betabarj - tbarmin,
+                                   method = "L-BFGS-B",
+                                   lower = lowerBE, upper = c(10,10),
+                                   control = list(fnscale = 1))$value/1000
 
-        ## Cantelli
-        typeII[2] <- (sigmasqbar)/(sigmasqbar + (betaj - betabarj - tbarmin)^2)
+                ## Cantelli
+                typeII[2] <- (sigmasqbar)/(sigmasqbar + (betaj - betabarj - tbarmin)^2)
 
-        ## Bhattacharyya
-        typeII[3] <- calcBhattacharyya(betaj - betabarj - tbarmin,
-                                       sigmasqbar = sigmasqbar,
-                                       TAUj_inf = TAUj_inf)
+                ## Bhattacharyya
+                typeII[3] <- calcBhattacharyya(betaj - betabarj - tbarmin,
+                                               sigmasqbar = sigmasqbar,
+                                               TAUj_inf = TAUj_inf)
 
-        ## Hoeffding
-        typeII[4] <- exp(-2 * (betaj - betabarj - tbarmin)^2/TAUj_2)
+                ## Hoeffding
+                typeII[4] <- exp(-2 * (betaj - betabarj - tbarmin)^2/TAUj_2)
 
-        ## Pinelis
-        typeII[5] <- factorial(5) * (exp(1)/5)^5 * (1 - pnorm(2 * (betaj - betabarj - tbarmin)/sqrt(TAUj_2)))
+                ## Pinelis
+                typeII[5] <- factorial(5) * (exp(1)/5)^5 * (1 - pnorm(2 * (betaj - betabarj - tbarmin)/sqrt(TAUj_2)))
 
-        typeII[typeII > 1] <- 1
+                typeII[typeII > 1] <- 1
+            }
 
         return(typeII)
     }
