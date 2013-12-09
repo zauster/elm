@@ -2,18 +2,18 @@
 ## Nonrandomized Bernoulli Test
 calcBernoulliTest <- function(Y, XROWS, TAUj_inf, Tau_j,
                               ww, kbar, pbar, alphabar,
-                              d, ds, b, a = 0,
-                              betaj, betabarj, alternative, iterations,
+                              d, ds, b, a = 0, # betaj,
+                              betabarj, alternative, iterations,
                               theta, lambda = 1)
     {
-        if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
-            {
-                stop(paste("betaj is too large, has to be <= ", round(b - ds, digits = 5)))
-            }
-        if(((betaj + ds - a)/(b - a) > 1) & (alternative == "less"))
-            {
-                stop(paste("betaj is too small, has to be >= ", round(ds - b, digits = 5)))
-            }
+        ## if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
+        ##     {
+        ##         stop(paste("betaj is too large, has to be <= ", round(b - ds, digits = 5)))
+        ##     }
+        ## if(((betaj + ds - a)/(b - a) > 1) & (alternative == "less"))
+        ##     {
+        ##         stop(paste("betaj is too small, has to be >= ", round(ds - b, digits = 5)))
+        ##     }
 
         Z <- XROWS * (Tau_j * Y + d)
         p1 <- (Z - a)/(b - a)
@@ -108,7 +108,7 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
                 theta <- Inf
             }
 
-        return(list(typeII = TYPEII_B,
+        return(list(typeII = ifelse(TYPEII_B < 1, TYPEII_B, 1),
                     theta = theta,
                     kbar = kbar,
                     pbar = pbar,

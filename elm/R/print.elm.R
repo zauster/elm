@@ -58,8 +58,12 @@ print.elm <- function(x, ..., digits = 5)
         ##         cat("\nnot yet available\n")
         ##     }
 
-        cat("estimated coefficient of beta_", x$parameter$j, ":",
-            "\t", x$betahatj, "\n", sep = "")
+        cat("estimated OLS coefficient of beta_", x$parameter$j, ":",
+            "\t", x$betahatjOLS, "\n", sep = "")
+        cat("estimated MM coefficient of beta_", x$parameter$j, ":",
+            "\t", x$betahatjMM, "\n", sep = "")
+        cat("TypeII minimizing betaj:", x$parameter$optbetaj, "\n")
+
         ## cat(paste("\treject H_0: beta_", x$parameter$j,
         ##           ifelse(x$parameter$alternative == "<=", " <= ", " >= "),
         ##           x$betabarj, "?", sep = ""),

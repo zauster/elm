@@ -1,5 +1,6 @@
 
 
+<<<<<<< HEAD
 library(Rlab)
 data(golf)
 Y <- matrix(golf$score)
@@ -42,6 +43,53 @@ monte <- 1000
 qq <- 0.0001 ##OLS (default=0.0001)
 qqmm <- 0.0001 ##MM (default=0.0001)
 elm(YY, XX, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
+=======
+## library(Rlab)
+## data(golf)
+## Y <- matrix(golf$score)
+## X <- cbind(1, as.matrix(golf[, -1]))
+## printdetails <- T
+## IE <- "<="
+## alpha <- 0.05
+## j <- 1
+## betabarj <- 100
+## betaj1 <- betabarj + 170
+## w1Y <- 60
+## w2Y <- 80
+## lambda <- 1
+## lambdamm <- 1
+## monte <- 1000
+## qq <- 0.0001 ##OLS (default=0.0001)
+## qqmm <- 0.0001 ##MM (default=0.0001)
+## elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 284)
+
+## step example
+n <- 60
+h <- 0.3
+Y <- sample(c(0, 1), size = n, replace = TRUE)
+X <- cbind(1, runif(n = n) < h)
+## alpha <- 0.05
+## qq <- qqmm <- 0.0001
+## lambda <- lambdamm <- 1
+
+## Given Y=X*beta+error where there are no assumptions imposed on the
+## errors, it tests the one sided
+## hypothesis H0: betaj<=betabarj against H1: betaj>betabarj where j
+## is index of coefficient.
+## It also tests H0: betaj>=betabarj against H1: betaj<betabarj.
+
+## IE <- "<="
+## w1Y <- 0
+## w2Y <- 1
+## j <- 2
+## betabarj = 0
+## betaj1 = .13
+## lambdamm <- 1
+## monte <- 1000
+## qq <- 0.0001 ##OLS (default=0.0001)
+## qqmm <- 0.0001 ##MM (default=0.0001)
+## elm(YY, XX, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
+>>>>>>> 6fd1cdc140ba7aefb1d7bf3331d0d7963aecdee0
 
 elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 betabarj = 0, betaj1 = betabarj + 1.1,
@@ -401,7 +449,10 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
                 htempOLS
             }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6fd1cdc140ba7aefb1d7bf3331d0d7963aecdee0
         TYPEII_BEfuncOLS <- optim(wb1start, hOLS, gr = NULL,
                                   method = "L-BFGS-B",
                                   lower = lowerBE, upper = c(10,10),
@@ -1243,11 +1294,14 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         ##         i <- i + 1
         ##     }
         p1mm[p1mm > 1] <- 1
+<<<<<<< HEAD
         if(max(p1mm) > 1)
             {
                 stop(paste(" largest p1 = ", round(max(p1mm), 4), ", has to be < 1 "))
             }
 
+=======
+>>>>>>> 6fd1cdc140ba7aefb1d7bf3331d0d7963aecdee0
         p0mm <- 1 - p1mm
 
         ## Wmm <- rep(0, times = monte * XROWS)
