@@ -53,6 +53,10 @@ print.elm <- function(x, ..., digits = 5)
         cat("n =", x$parameter$n, ", m =", x$parameter$m)
         cat("\n")
 
+        cat("Tested coefficients:")
+        ## for(coef in coefficients)
+
+
         ## if(x$printdetails == TRUE)
         ##     {
         ##         cat("\nnot yet available\n")
@@ -103,5 +107,11 @@ print.elm <- function(x, ..., digits = 5)
                 cat("\n   iterations:", x$parameter$iterations)
             }
         cat("\n")
+
+    }
+
+printCoefs <- function(x) ## x being a list of results from a test of
+    ## a coefficient
+    {
 
     }

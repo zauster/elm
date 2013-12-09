@@ -12,7 +12,7 @@
 elm.new <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
                 alpha = 0.05, j = 2,
-                betabarj = 0, betaj = 0.5,
+                betabarj = 0, # betaj = 0.5,
                 lambda = 1, lambdamm = 1,
                 iterations = 1000, qq = 0.0001, qqmm = 0.0001)
 {
@@ -23,6 +23,10 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     ## for prettier output
     YNAME <- deparse(substitute(Y))
     XNAME <- deparse(substitute(X))
+    COEFNAME <- ifelse(!is.null(colnames(X)[j]),
+                       colnames(X)[j],
+                       paste("beta_", j, sep = ""))
+
     bounds <- paste("[", lower, ", ", upper, "]", sep = "")
 
     if(min(Y) < lower | max(Y) > upper)
@@ -110,7 +114,6 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     ##
     ## MM Estimate
     ##
-
     obj <- c(rep(0,XROWS),1)
     mat <- matrix(rbind(cbind(diag(XROWS), rep(-1, XROWS)),
                         cbind(diag(XROWS), rep(1, XROWS)),
@@ -145,6 +148,16 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
                                                        qqmm * TAUjmm_2_min),
                                                    min(Taumm_j[i]/TAUjmm_2_min,
                                                        -qqmm * TAUjmm_2_min)))
+
+    b <- XROWS * TAUj_inf
+    d <- sapply(1:XROWS, function(i) (1 - lambda) * max(-Tau_j[i] * ww,
+                                                        -Tau_j[i] * (ww + 1)) + lambda * (TAUj_inf - max(Tau_j[i] * ww, Tau_j[i] * (ww + 1))))
+    ds <- sum(d)
+
+    bmm <- XROWS * TAUjmm_inf
+    dmm <- sapply(1:XROWS, function(i) (1 - lambdamm) * max(-Taumm_j[i] * ww,
+                                                        -Taumm_j[i] * (ww + 1)) + lambdamm * (TAUjmm_inf - max(Taumm_j[i] * ww, Taumm_j[i] * (ww + 1))))
+    dsmm <- sum(dmm)
 
     ## ## ## ##
     ## ## ## ## Tests
@@ -233,10 +246,6 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
                                               alpha = alpha,
                                               ds = ds, b = b,
                                               XROWS = XROWS)
-    b <- XROWS * TAUj_inf
-    d <- sapply(1:XROWS, function(i) (1 - lambda) * max(-Tau_j[i] * ww,
-                                                        -Tau_j[i] * (ww + 1)) + lambda * (TAUj_inf - max(Tau_j[i] * ww, Tau_j[i] * (ww + 1))))
-    ds <- sum(d)
 
     OLSBernoulliTest <- calcBernoulliTest(Y = Y, XROWS = XROWS,
                                           TAUj_inf = TAUj_inf,
@@ -269,10 +278,7 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
                                              alpha = alpha,
                                              ds = dsmm, b = bmm,
                                              XROWS = XROWS)
-    bmm <- XROWS * TAUjmm_inf
-    dmm <- sapply(1:XROWS, function(i) (1 - lambdamm) * max(-Taumm_j[i] * ww,
-                                                        -Taumm_j[i] * (ww + 1)) + lambdamm * (TAUjmm_inf - max(Taumm_j[i] * ww, Taumm_j[i] * (ww + 1))))
-    dsmm <- sum(dmm)
+
     MMBernoulliTest <- calcBernoulliTest(Y = Y, XROWS = XROWS,
                                          TAUj_inf = TAUjmm_inf,
                                          Tau_j = Taumm_j, ww = ww,
@@ -313,6 +319,7 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     structure(list(method = method,
                    yname = YNAME,
                    xname = XNAME,
+                   coefname = COEFNAME,
                    betabarj = betabarj,
                    betaj = betaj,
                    betahatjOLS = betahatj,
