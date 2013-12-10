@@ -1,10 +1,10 @@
 
 ## Nonrandomized Bernoulli Test
-calcBernoulliTest <- function(Y, XROWS, TAUj_inf, Tau_j,
-                              ww, kbar, pbar, alphabar,
+calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
+                              ww, Bernoulliparameter,
                               d, ds, b, a = 0, # betaj,
                               betabarj, alternative, iterations,
-                              theta, lambda = 1)
+                              lambda = 1)
     {
         ## if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
         ##     {
@@ -14,16 +14,13 @@ calcBernoulliTest <- function(Y, XROWS, TAUj_inf, Tau_j,
         ##     {
         ##         stop(paste("betaj is too small, has to be >= ", round(ds - b, digits = 5)))
         ##     }
+        kbar <- Bernoulliparameter$kbar
+        pbar <- Bernoulliparameter$pbar
+        alphabar <- Bernoulliparameter$alphabar
+        theta <- Bernoulliparameter$theta
 
-        Z <- XROWS * (Tau_j * Y + d)
+        Z <- XROWS * (tau_j * Y + d)
         p1 <- (Z - a)/(b - a)
-
-        ## not clear why this was here:
-        ## i <- 1
-        ## while(i <= XROWS){
-        ## if(p1[i]>1) {p1[i] <- 1}
-        ## i <- i + 1}
-        ## so changed it into this:
 
         if(max(p1) > 1)
             {
@@ -37,13 +34,10 @@ calcBernoulliTest <- function(Y, XROWS, TAUj_inf, Tau_j,
         rej <- mean(r_alphaprimeWbar1(Wbars, XROWS, kbar, pbar, alphabar))
         error <- exp(-2 * iterations * (rej - theta)^2)
 
-        return(c(probability_rejection = rej,
+        return(list(prob_rejection = rej,
+                    theta = theta,
                     error = error,
-                    theta = theta))
-        ## to return:
-        ## theta
-        ## rej
-        ## error
+                    typeII = Bernoulliparameter$typeII))
     }
 
 calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
@@ -144,5 +138,9 @@ r_alphaprimeWbar1 <- function(Wbar, XROWS, kbar, pbar, alphabar)
     {
         res <- ifelse(XROWS * Wbar >= kbar, 1,
                       ifelse(XROWS * Wbar != kbar - 1, 0,
-                             (alphabar - Bkp(kbar, pbar, XROWS))/(Bkp(kbar - 1, pbar, XROWS) - Bkp(kbar, pbar, XROWS))))
+                             (alphabar - Bkp(kbar, pbar,
+                                             XROWS))/(Bkp(kbar - 1, pbar,
+                                                          XROWS) - Bkp(kbar, pbar,
+                                                                       XROWS))))
+        res
     }

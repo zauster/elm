@@ -1,22 +1,23 @@
 
-minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, Tau_jB,
-                      TAUj_2, Tau_j, TAUj_inf, betabarj, tbarmin,
+minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
+                      tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
                       alpha, ds, b,
-                      Taumm_jB, TAUjmm_2, TAUjmm_inf, tbarminmm,
+                      taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
                       dsmm, bmm, root = FALSE)
     {
         ## OLS Nonstandardized
         sigmasqbarOLS <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                                        Tau_jB, TAUj_2, Tau_j,
-                                        betabarj, betaj)
+                                        tau_jB, tauj_2, tau_j,
+                                        betabarj, betaj,
+                                        type = "typeII")
         OLSNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                               lowerBE = rep(10^-6, 2),
                                                               sigmasqbar = sigmasqbarOLS["TypeII"],
                                                               betaj = betaj,
                                                               betabarj = betabarj,
                                                               tbarmin = tbarmin,
-                                                              TAUj_2 = TAUj_2,
-                                                              TAUj_inf = TAUj_inf)
+                                                              tauj_2 = tauj_2,
+                                                              tauj_inf = tauj_inf)
         OLSNonstandardizedTypeII <- min(OLSNonstandardizedTypeII)
         names(OLSNonstandardizedTypeII) <- "Nonstandardized (OLS)"
 
@@ -26,20 +27,21 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, Tau_jB,
                                                   alpha = alpha,
                                                   ds = ds, b = b,
                                                   XROWS = XROWS)$typeII
-        names(OLSBernoulliTypeII) <- "Bernoulli (OLS)"
+        names(OLSBernoulliTypeII) <- "    Bernoulli (OLS)"
 
         ## MM Nonstandardized
         sigmasqbarMM <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                                       Taumm_jB, TAUjmm_2, TAUjmm_inf,
-                                       betabarj, betaj)
+                                       taumm_jB, taujmm_2, taujmm_inf,
+                                       betabarj, betaj,
+                                        type = "typeII")
         MMNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                              lowerBE = rep(10^-6, 2),
                                                              sigmasqbar = sigmasqbarMM["TypeII"],
                                                              betaj = betaj,
                                                              betabarj = betabarj,
                                                              tbarmin = tbarminmm,
-                                                             TAUj_2 = TAUjmm_2,
-                                                             TAUj_inf = TAUjmm_inf)
+                                                             tauj_2 = taujmm_2,
+                                                             tauj_inf = taujmm_inf)
         MMNonstandardizedTypeII <- min(MMNonstandardizedTypeII)
         names(MMNonstandardizedTypeII) <- "Nonstandardized (MM)"
 
@@ -49,7 +51,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, Tau_jB,
                                                  alpha = alpha,
                                                  ds = dsmm, b = bmm,
                                                  XROWS = XROWS)$typeII
-        names(MMBernoulliTypeII) <- "Bernoulli (MM)"
+        names(MMBernoulliTypeII) <- "    Bernoulli (MM)"
 
         res <- c(OLSNonstandardizedTypeII,
                    OLSBernoulliTypeII,
@@ -65,18 +67,18 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, Tau_jB,
         return(res)
     }
 
-findMinTypeII <- function(X, ww, XROWS, XCOLS, ej, Tau_jB,
-                      TAUj_2, Tau_j, TAUj_inf, betabarj, tbarmin,
+findMinTypeII <- function(X, ww, XROWS, XCOLS, ej, tau_jB,
+                      tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
                       alpha, ds, b,
-                      Taumm_jB, TAUjmm_2, TAUjmm_inf, tbarminmm,
+                      taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
                       dsmm, bmm, root = TRUE)
     {
         res <- uniroot(minTypeII, c(0.0001, 0.99), X, ww, XROWS, XCOLS, ej,
-                       Tau_jB, TAUj_2, Tau_j,
-                       TAUj_inf, betabarj, tbarmin,
+                       tau_jB, tauj_2, tau_j,
+                       tauj_inf, betabarj, tbarmin,
                        alpha, ds, b,
-                       Taumm_jB, TAUjmm_2,
-                       TAUjmm_inf, tbarminmm, dsmm, bmm, root = root,
+                       taumm_jB, taujmm_2,
+                       taujmm_inf, tbarminmm, dsmm, bmm, root = root,
                        tol = .Machine$double.eps^0.5)
 
         res
@@ -89,10 +91,10 @@ findMinTypeII <- function(X, ww, XROWS, XCOLS, ej, Tau_jB,
 ## for(x in 1:99/100)
 ##     {
         ## res <- rbind(res, minTypeII(x, X, ww, XROWS, XCOLS, ej,
-        ##                             Tau_jB, TAUj_2, Tau_j,
-        ##                             TAUj_inf, betabarj, tbarmin,
+        ##                             tau_jB, tauj_2, tau_j,
+        ##                             tauj_inf, betabarj, tbarmin,
         ##                             alpha, ds, b,
-        ##                             Taumm_jB, TAUjmm_2,
-        ##                             TAUjmm_inf, tbarminmm, dsmm, bmm))
+        ##                             taumm_jB, taujmm_2,
+        ##                             taujmm_inf, tbarminmm, dsmm, bmm))
 ##     }
 ## matplot(res, type = "l")

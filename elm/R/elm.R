@@ -19,10 +19,10 @@
 ## elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 284)
 
 ## step example
-n <- 60
-h <- 0.3
-Y <- sample(c(0, 1), size = n, replace = TRUE)
-X <- cbind(1, runif(n = n) < h)
+## n <- 60
+## h <- 0.5
+## Y <- sample(c(0, 1), size = n, replace = TRUE)
+## X <- cbind(1, runif(n = n) < h)
 ## alpha <- 0.05
 ## qq <- qqmm <- 0.0001
 ## lambda <- lambdamm <- 1
@@ -45,7 +45,7 @@ X <- cbind(1, runif(n = n) < h)
 ## qqmm <- 0.0001 ##MM (default=0.0001)
 ## elm(YY, XX, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
 
-elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
+elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, coefs = 2,
                 betabarj = 0, betaj1 = betabarj + 1.1,
                 lambda = 1, lambdamm = 1,
                 monte = 1000, qq = 0.0001, qqmm = 0.0001,
@@ -58,6 +58,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, j = 2,
         require(quadprog)
         YNAME <- deparse(substitute(Y))
         XNAME <- deparse(substitute(X))
+        j <- coefs
 
         if(min(Y) < w1Y | max(Y) > w2Y)
             {
