@@ -1,5 +1,6 @@
 
-testCoefficient <- function(j, Y, X, betahat, betabarj, alpha,
+testCoefficient <- function(j, Y, X, ww,
+                            betahat, betabarj, alpha,
                             alternative, XROWS, XCOLS,
                             tau, iterations,
                             qq, qqmm, lambda, lambdamm)
@@ -30,11 +31,12 @@ testCoefficient <- function(j, Y, X, betahat, betabarj, alpha,
     tauj_inf_min001 <- min(0.01, tauj_inf) ## less computations
     tauj_inf_min1 <- min(1, tauj_inf)
 
-    tau_jB <- sapply(1:XROWS, function(i) ifelse(tau_j[i] >= 0,
-                                                 max(tau_j[i]/tauj_inf_min001,
-                                                     qq * tauj_inf_min1),
-                                                 min(tau_j[i]/tauj_inf_min001,
-                                                     -qq * tauj_inf_min1)))
+    tau_jB <- sapply(1:XROWS,
+                     function(i) ifelse(tau_j[i] >= 0,
+                                        max(tau_j[i]/tauj_inf_min001,
+                                            qq * tauj_inf_min1),
+                                        min(tau_j[i]/tauj_inf_min001,
+                                            -qq * tauj_inf_min1)))
 
 
     ##
@@ -69,15 +71,17 @@ testCoefficient <- function(j, Y, X, betahat, betabarj, alpha,
     taumm_jB <- rep(0,times = XROWS)
     taujmm_2_min <- min(1, taujmm_2) ## less computations
 
-    taumm_jB <- sapply(1:XROWS, function(i) ifelse(taumm_j[i] >= 0,
-                                                   max(taumm_j[i]/taujmm_2_min,
-                                                       qqmm * taujmm_2_min),
-                                                   min(taumm_j[i]/taujmm_2_min,
-                                                       -qqmm * taujmm_2_min)))
+    taumm_jB <- sapply(1:XROWS,
+                       function(i) ifelse(taumm_j[i] >= 0,
+                                          max(taumm_j[i]/taujmm_2_min,
+                                              qqmm * taujmm_2_min),
+                                          min(taumm_j[i]/taujmm_2_min,
+                                              -qqmm * taujmm_2_min)))
 
     b <- XROWS * tauj_inf
-    d <- sapply(1:XROWS, function(i) (1 - lambda) * max(-tau_j[i] * ww,
-                                                        -tau_j[i] * (ww + 1)) + lambda * (tauj_inf - max(tau_j[i] * ww, tau_j[i] * (ww + 1))))
+    d <- sapply(1:XROWS,
+                function(i) (1 - lambda) * max(-tau_j[i] * ww,
+                                               -tau_j[i] * (ww + 1)) + lambda * (tauj_inf - max(tau_j[i] * ww, tau_j[i] * (ww + 1))))
     ds <- sum(d)
 
     bmm <- XROWS * taujmm_inf
@@ -212,34 +216,41 @@ testCoefficient <- function(j, Y, X, betahat, betabarj, alpha,
                                          alternative = alternative,
                                          iterations = iterations)
 
-    results <- switch(which.min(TypeII),
-                         {c(tbarOLS,
-                            betahatj - betabarj)
-                          },
-                         {c(OLSBernoulliTest$theta,
-                            OLSBernoulliTest$probability_rejection)
-                          },
-                         {c(tbarMM,
-                            betahatj - betabarj)
-                          },
-                         {c(MMBernoulliTest$theta,
-                            MMBernoulliTest$probability_rejection)})
+    minimizingTest <- which.min(TypeII)
+    results <- switch(minimizingTest,
+                      {c(tbarOLS,
+                         betahatj - betabarj)
+                   },
+                      {c(OLSBernoulliTest$theta,
+                         OLSBernoulliTest$prob_rejection)
+                   },
+                      {c(tbarMM,
+                         betahatj - betabarj)
+                   },
+                      {c(MMBernoulliTest$theta,
+                         MMBernoulliTest$prob_rejection)})
 
     chosenTest <- list(nullHypothesis,
                        results[1],
                        results[2],
                        betahatj,
                        ifelse(results[1] < results[2], "Yes", "No"),
-                       names(TypeII)[which.min(TypeII)])
-    if(which.min(TypeII) == 1 | which.min(TypeII) == 3)
+                       names(TypeII)[minimizingTest])
+    if(minimizingTest == 1 | minimizingTest == 3)
         {
-            names(chosenTest) <- c("H_0", "tbar", "Test Statistic", "Estimate",
+            names(chosenTest) <- c("H_0", "tbar", "Test Statistic",
+                                   ifelse(minimizingTest == 1,
+                                          "(OLS) Estimate",
+                                          "(MM) Estimate"),
                                    "Rejection", "chosen Test")
-        }
-    else
-        {
-            names(chosenTest) <- c("H_0", "theta", "Prob rejection", "Estimate",
-                                   "Rejection", "chosen Test")
+}
+else
+    {
+        names(chosenTest) <- c("H_0", "theta", "Prob rejection",
+                               ifelse(minimizingTest == 2,
+                                      "(OLS) Estimate",
+                                      "(MM) Estimate"),
+                               "Rejection", "chosen Test")
         }
 
     OLSNonstandardized <- list(NonstandardizedTests = OLSNonstandardizedTests,

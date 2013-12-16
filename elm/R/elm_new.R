@@ -14,7 +14,9 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
                 alpha = 0.05, coefs = 2,
                 betabarj = 0, # betaj = 0.5,
                 lambda = 1, lambdamm = 1,
-                iterations = 1000, qq = 0.0001, qqmm = 0.0001)
+                    qq = 0.0001, qqmm = 0.0001,
+                iterations = 1000,
+                    na.action = getOption("na.action"))
 {
     ## check required packages
     ## require(Rglpk)
@@ -24,6 +26,8 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     YNAME <- deparse(substitute(Y))
     XNAME <- deparse(substitute(X))
 
+    X <- as.matrix(X)
+    Y <- as.vector(Y)
 
     bounds <- paste("[", lower, ", ", upper, "]", sep = "")
 
@@ -36,6 +40,23 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
         {
             stop("There is only one covariate, please add a constant.")
         }
+
+    if(length(Y) != dim(X)[1])
+        {
+            stop("X and Y are of unequal length.")
+        }
+
+    ## NA options
+    switch(na.action,
+           na.omit = {complete <- complete.cases(cbind(Y, X))
+                      Y <- Y[complete]
+                      X <- X[complete, ]},
+           na.fail = {na.fail(Y)
+                      na.fail(X)},
+           na.pass = {},
+           na.exclude = {complete <- complete.cases(cbind(Y, X))
+                         Y <- Y[complete]
+                         X <- X[complete, ]})
 
     ## check if X has full rank
     if(det(t(X) %*% X) == 0)
@@ -89,16 +110,14 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     coefTests <- list()
     for(j in coefs)
         {
-            coefTests[[length(coefTests) + 1L]] <- testCoefficient(j = j,
-                                                                   Y = Y,
-                                                                   X = X,
+            coefTests[[length(coefTests) + 1L]] <- testCoefficient(j = j, Y = Y, X = X,
+                                                                   ww = ww,
                                                                    betahat = betahat,
                                                                    betabarj = betabarj,
                                                                    alpha = alpha,
                                                                    alternative = alternative,
                                                                    XROWS = XROWS,
-                                                                   XCOLS = XCOLS,
-                                                                   tau = tau,
+                                                                   XCOLS = XCOLS, tau = tau,
                                                                    iterations = iterations,
                                                                    qq = qq, qqmm = qqmm,
                                                                    lambda = lambda,

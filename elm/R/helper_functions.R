@@ -68,3 +68,18 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
             }
         sigmasqbar
     }
+
+is.constant1 <- function(x)
+    {
+        length(unique(x)) == 1
+    }
+
+is.constant2 <- function(x)
+    {
+        sd(x, na.rm = TRUE) == 0
+    }
+
+is.constant3 <- function(x)
+    {
+        all(is.na(x)) | all(x[1L] == x)
+    }
