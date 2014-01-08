@@ -29,7 +29,8 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
 
         ## p0 <- 1 - p1
 
-        W <- sapply(1:XROWS, function(x) rbinom(n = iterations, size = 1, p1[x]))
+        W <- vapply(1:XROWS, function(x) rbinom(n = iterations, size = 1, p1[x]),
+                    vector(mode = "double", length = 1000))
         Wbars <- rowMeans(W)
         rej <- mean(r_alphaprimeWbar1(Wbars, XROWS, kbar, pbar, alphabar))
         error <- exp(-2 * iterations * (rej - theta)^2)

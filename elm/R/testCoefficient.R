@@ -1,9 +1,11 @@
 
 testCoefficient <- function(j, Y, X, ww,
                             betahat, betabarj, alpha,
+                            upperbetabound,
                             alternative, XROWS, XCOLS,
                             tau, iterations,
-                            qq, qqmm, lambda, lambdamm)
+                            qq, qqmm, lambda, lambdamm,
+                            silent)
 {
     COEFNAME <- ifelse(!is.null(colnames(X)[j]),
                        colnames(X)[j],
@@ -31,13 +33,13 @@ testCoefficient <- function(j, Y, X, ww,
     tauj_inf_min001 <- min(0.01, tauj_inf) ## less computations
     tauj_inf_min1 <- min(1, tauj_inf)
 
-    tau_jB <- sapply(1:XROWS,
+    tau_jB <- vapply(1:XROWS,
                      function(i) ifelse(tau_j[i] >= 0,
                                         max(tau_j[i]/tauj_inf_min001,
                                             qq * tauj_inf_min1),
                                         min(tau_j[i]/tauj_inf_min001,
-                                            -qq * tauj_inf_min1)))
-
+                                            -qq * tauj_inf_min1)),
+                     vector(mode = "double", length = 1))
 
     ##
     ## MM Estimate
@@ -71,22 +73,25 @@ testCoefficient <- function(j, Y, X, ww,
     taumm_jB <- rep(0,times = XROWS)
     taujmm_2_min <- min(1, taujmm_2) ## less computations
 
-    taumm_jB <- sapply(1:XROWS,
+    taumm_jB <- vapply(1:XROWS,
                        function(i) ifelse(taumm_j[i] >= 0,
                                           max(taumm_j[i]/taujmm_2_min,
                                               qqmm * taujmm_2_min),
                                           min(taumm_j[i]/taujmm_2_min,
-                                              -qqmm * taujmm_2_min)))
+                                              -qqmm * taujmm_2_min)),
+                     vector(mode = "double", length = 1))
 
     b <- XROWS * tauj_inf
-    d <- sapply(1:XROWS,
+    d <- vapply(1:XROWS,
                 function(i) (1 - lambda) * max(-tau_j[i] * ww,
-                                               -tau_j[i] * (ww + 1)) + lambda * (tauj_inf - max(tau_j[i] * ww, tau_j[i] * (ww + 1))))
+                                               -tau_j[i] * (ww + 1)) + lambda * (tauj_inf - max(tau_j[i] * ww, tau_j[i] * (ww + 1))),
+                     vector(mode = "double", length = 1))
     ds <- sum(d)
 
     bmm <- XROWS * taujmm_inf
-    dmm <- sapply(1:XROWS, function(i) (1 - lambdamm) * max(-taumm_j[i] * ww,
-                                                            -taumm_j[i] * (ww + 1)) + lambdamm * (taujmm_inf - max(taumm_j[i] * ww, taumm_j[i] * (ww + 1))))
+    dmm <- vapply(1:XROWS, function(i) (1 - lambdamm) * max(-taumm_j[i] * ww,
+                                                            -taumm_j[i] * (ww + 1)) + lambdamm * (taujmm_inf - max(taumm_j[i] * ww, taumm_j[i] * (ww + 1))),
+                     vector(mode = "double", length = 1))
     dsmm <- sum(dmm)
 
     ## ## ## ##
@@ -139,7 +144,24 @@ testCoefficient <- function(j, Y, X, ww,
     ## TypeII Optimization
     ##
     ## find betaj that brings typeII to 0.5
-    optbetaj <- findMinTypeII(X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS,
+    ## limit <- findUpperLimit(betabarj, betabarj + 35 * abs(betahatj),
+    ##                         steps = 25, X = X, ww = ww,
+    ##                         XROWS = XROWS, XCOLS = XCOLS,
+    ##                         ej = ej,
+    ##                        tau_jB = tau_jB, tauj_2 = tauj_2, tau_j = tau_j,
+    ##                        betaj = betaj, type = "typeI",
+    ##                        zero = 10^-12)
+    ## cat("limit: ", limit)
+
+    if(is.null(upperbetabound))
+        {
+            upperbetabound <- 0.9 * findHighestBeta(Y, X, j)
+            cat("\nupper: ", upperbetabound)
+
+        }
+
+    optbetaj <- findMinTypeII(upperbetabound = upperbetabound,
+                              X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS,
                               ej = ej, tau_jB = tau_jB, tauj_2 = tauj_2,
                               tau_j = tau_j, tauj_inf = tauj_inf,
                               betabarj = betabarj,
@@ -148,7 +170,8 @@ testCoefficient <- function(j, Y, X, ww,
                               taumm_jB = taumm_jB, taujmm_2 = taujmm_2,
                               taujmm_inf = taujmm_inf,
                               tbarminmm = tbarMM,
-                              dsmm = dsmm, bmm = bmm)$root
+                              dsmm = dsmm, bmm = bmm,
+                              silent = silent)$root
 
     TypeII <- minTypeII(betaj = optbetaj,
                         X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS,
@@ -263,6 +286,7 @@ else
                         BernoulliTypeII = MMBernoulliTypeII)
 
     res <- list(j = j,
+                coefname = COEFNAME,
                 betabarj = betabarj,
                 betaj = optbetaj,
                 tbars = c(tbarOLS = tbarOLS,

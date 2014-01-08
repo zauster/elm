@@ -1,14 +1,14 @@
 
-## library(Rlab)
-## data(golf)
-## Y <- matrix(golf$score)
-## X <- cbind(1, as.matrix(golf[, -1]))
-## printdetails <- T
+library(Rlab)
+data(golf)
+Y <- matrix(golf$score)
+X <- cbind(1, as.matrix(golf[, -1]))
+printdetails <- T
 ## IE <- "<="
 ## alpha <- 0.05
 ## j <- 1
-## betabarj <- 100
-## betaj1 <- betabarj + 170
+betabarj <- 100
+betaj1 <- betabarj + 170
 ## w1Y <- 60
 ## w2Y <- 80
 ## lambda <- 1
@@ -19,13 +19,13 @@
 ## elm(Y, X, 60, 80, j = 1, betabarj = 100, betaj1 = 284)
 
 ## step example
-## n <- 60
-## h <- 0.5
-## Y <- sample(c(0, 1), size = n, replace = TRUE)
-## X <- cbind(1, runif(n = n) < h)
-## alpha <- 0.05
-## qq <- qqmm <- 0.0001
-## lambda <- lambdamm <- 1
+n <- 150
+h <- 0.2
+Y <- sample(c(0, 1), size = n, replace = TRUE)
+X <- cbind(1, runif(n = n) < h)
+alpha <- 0.05
+qq <- qqmm <- 0.0001
+lambda <- lambdamm <- 1
 
 ## Given Y=X*beta+error where there are no assumptions imposed on the
 ## errors, it tests the one sided
@@ -33,19 +33,19 @@
 ## is index of coefficient.
 ## It also tests H0: betaj>=betabarj against H1: betaj<betabarj.
 
-## IE <- "<="
-## w1Y <- 0
-## w2Y <- 1
-## j <- 2
-## betabarj = 0
-## betaj1 = .13
-## lambdamm <- 1
-## monte <- 1000
-## qq <- 0.0001 ##OLS (default=0.0001)
-## qqmm <- 0.0001 ##MM (default=0.0001)
+IE <- "<="
+w1Y <- 0
+w2Y <- 1
+j <- coefs <- 2
+betabarj = 0
+betaj1 = .2075
+lambdamm <- 1
+monte <- 1000
+qq <- 0.0001 ##OLS (default=0.0001)
+qqmm <- 0.0001 ##MM (default=0.0001)
 ## elm(YY, XX, 0, 1, j = 2, betabarj = 0, betaj1 = .13)
 
-elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, coefs = 2,
+elmo <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, coefs = 2,
                 betabarj = 0, betaj1 = betabarj + 1.1,
                 lambda = 1, lambdamm = 1,
                 monte = 1000, qq = 0.0001, qqmm = 0.0001,
@@ -335,7 +335,11 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, coefs = 2,
                 RejectNonstandardizedOLS <- "NO"
             }
 
-
+        DmatOLS <- 2 * t(X) %*% ((Tau_jB^2) * X)
+        dvecOLS <- (1 + 2 * ww) * colMeans((Tau_jB^2) * X) * XROWS
+        Amat <- t(matrix(rbind(-t(ej), X, -X), ncol = XCOLS))
+        bvec0 <- as.vector(c(-betabarj0, rep(ww, times = XROWS),
+                             rep(-(ww + 1), times = XROWS)))
         ## Type 2 OLS
         if(det(DmatOLS) <= zero)
             {
@@ -361,6 +365,7 @@ elm <- function(Y, X, w1Y, w2Y, IE = "<=", alpha = 0.05, coefs = 2,
                 ## but can also come if betaj1 is not close enough to 0
 
                 zsolOLS <- sigmasqbar_betajOLSQP$solution
+                cat("\nzsolOLS: ", zsolOLS)
 
                 sigmasqbar_betajOLSvalue <- sum((Tau_j)^2 * ((X %*% zsolOLS-ww) * (1 + ww-X %*% zsolOLS)))
             }

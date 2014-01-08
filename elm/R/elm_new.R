@@ -8,15 +8,26 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
+source("NonstandardizedTest.R")
+source("BernoulliTest.R")
+source("TypeIIOptimization.R")
+source("testCoefficient.R")
+source("Sigmasqbar.R")
+source("miscfun.R")
+source("print.elm.R")
 
-elm.new <- function(Y, X, lower = 0, upper = 1,
+
+elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
                 alpha = 0.05, coefs = 2,
-                betabarj = 0, # betaj = 0.5,
+                betabarj = 0,
+                upperbetabound = 1,
                 lambda = 1, lambdamm = 1,
-                    qq = 0.0001, qqmm = 0.0001,
+                qq = 0.0001, qqmm = 0.0001,
                 iterations = 1000,
-                    na.action = getOption("na.action"))
+                silent = FALSE, ## warning during search for optimal beta
+                verbose = TRUE, ## results for all tests
+                na.action = getOption("na.action"))
 {
     ## check required packages
     ## require(Rglpk)
@@ -26,8 +37,19 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     YNAME <- deparse(substitute(Y))
     XNAME <- deparse(substitute(X))
 
+    if(is.data.frame(X) == TRUE)
+        {
+            X <- data.matrix(X)
+        }
+
     X <- as.matrix(X)
     Y <- as.vector(Y)
+
+    if(any(apply(X, 2, is.constant1)) == FALSE)
+        {
+            warning("No intercept found, thus included.")
+            X <- cbind(1, X)
+        }
 
     bounds <- paste("[", lower, ", ", upper, "]", sep = "")
 
@@ -102,9 +124,8 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     ##
     ## OLS estimate
     ##
-    betahat <- solve((crossprod(X))) %*% crossprod(X, Y) # TODO:
+    betahat <- solve(crossprod(X)) %*% crossprod(X, Y) # TODO:
                                         # numerically stable?
-
     tau <- X %*% solve(crossprod(X))
 
     coefTests <- list()
@@ -115,13 +136,15 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
                                                                    betahat = betahat,
                                                                    betabarj = betabarj,
                                                                    alpha = alpha,
+                                                                   upperbetabound = upperbetabound,
                                                                    alternative = alternative,
                                                                    XROWS = XROWS,
                                                                    XCOLS = XCOLS, tau = tau,
                                                                    iterations = iterations,
                                                                    qq = qq, qqmm = qqmm,
                                                                    lambda = lambda,
-                                                                   lambdamm = lambdamm)
+                                                                   lambdamm = lambdamm,
+                                                                   silent = silent)
         }
 
     ##
@@ -141,6 +164,7 @@ elm.new <- function(Y, X, lower = 0, upper = 1,
     structure(list(method = method,
                    yname = YNAME,
                    xname = XNAME,
+                   verbose = verbose,
                    parameter = parameter,
                    coefTests = coefTests),
               class = "elm")
