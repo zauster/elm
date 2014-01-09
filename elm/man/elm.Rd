@@ -7,10 +7,19 @@ Exact linear models
   Uses exact tests for the coefficients of linear regressions.
 }
 \usage{
-elm(Y, X, lower = 0, upper = 1, alternative = "greater",
-    alpha = 0.05, j = 2, betabarj = 0, betaj = 0.5,
-    lambda = 1, lambdamm = 1, iterations = 1000,
-    qq = 0.0001, qqmm = 0.0001)
+elm(Y, X, lower = 0, upper = 1,
+    alternative = "greater",
+    alpha = 0.05,
+    coefs = 2, 
+    nullvalue = 0, 
+    upperbetabound = 1,
+    lambda = 1, lambdamm = 1,
+    qq = 0.0001, qqmm = 0.0001,
+    iterations = 1000,
+    steppc = 0.1,
+    silent = FALSE,
+    verbose = TRUE,
+    na.action = getOption("na.action"))
 }
 
 \arguments{
@@ -29,15 +38,25 @@ elm(Y, X, lower = 0, upper = 1, alternative = "greater",
   \item{alpha}{
     the type I error.
 }
-  \item{j}{
+  \item{coefs}{
     index of the coefficient to be tested
 }
-  \item{betabarj}{
+  \item{nullvalue}{
     the critical value for the null hypothesis
 }
-  \item{betaj}{
-    value of the coefficient under the alternative. to bring the type II
-  error to 0.5
+  \item{upperbetabound}{
+    the upper bound of beta in the set of the alternative
+  hypothesis. The program tries to find a beta in [\code{nullvalue},
+  \code{upperbetabound}] which brings the typeII error to 0.5. If
+  \code{upperbetabound} is set to \code{NULL}, it will try to guess a
+  usable \code{upperbetabound} and slowly increase (\code{steppc}
+  controls the increases) it until it finds an
+  optimal beta. This could be, however, computationally expensive.
+}
+\item{steppc}{
+  Controls the size of the steps taken in finding the optimal beta. The
+  stepwise increase is \code{upperbetabound} * \code{steppc}. Default is
+  0.1. 
 }
   \item{lambda}{
 %%     ~~Describe \code{lambda} here~~
@@ -53,6 +72,15 @@ elm(Y, X, lower = 0, upper = 1, alternative = "greater",
 }
   \item{qqmm}{
 %%     ~~Describe \code{qqmm} here~~
+}
+\item{silent}{
+  Should warnings during the procedure be displayed? Default is FALSE.
+}
+\item{verbose}{
+  If FALSE, it prints only essential summary of the test. Default is TRUE.
+}
+\item{na.action}{
+  How to cope with missing values. Uses system-default as default value.
 }
 }
 \details{
@@ -86,7 +114,7 @@ n <- 40
 h <- 0.5
 Y <- sample(c(0, 1), size = n, replace = TRUE)
 X <- cbind(1, runif(n = n) < h)
-elm(Y, X, 0, 1, j = 2, betabarj = 0, betaj = .43)
+elm(Y, X, 0, 1, coefs = 2, nullvalue = 0, upperbetabound = NULL)
 }
 \keyword{linear regression}
 \keyword{exact method}

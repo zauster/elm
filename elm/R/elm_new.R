@@ -8,14 +8,13 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
-source("NonstandardizedTest.R")
-source("BernoulliTest.R")
-source("TypeIIOptimization.R")
-source("testCoefficient.R")
-source("Sigmasqbar.R")
-source("miscfun.R")
-source("print.elm.R")
-
+## source("NonstandardizedTest.R")
+## source("BernoulliTest.R")
+## source("TypeIIOptimization.R")
+## source("testCoefficient.R")
+## source("Sigmasqbar.R")
+## source("miscfun.R")
+## source("print.elm.R")
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
