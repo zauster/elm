@@ -19,12 +19,14 @@ source("print.elm.R")
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
-                alpha = 0.05, coefs = 2,
-                betabarj = 0,
+                alpha = 0.05,
+                coefs = 2, ## coefficients to be tested
+                nullvalue = 0, ## the threshold value in the null hypothesis
                 upperbetabound = 1,
                 lambda = 1, lambdamm = 1,
                 qq = 0.0001, qqmm = 0.0001,
                 iterations = 1000,
+                steppc = 0.1,
                 silent = FALSE, ## warning during search for optimal beta
                 verbose = TRUE, ## results for all tests
                 na.action = getOption("na.action"))
@@ -45,6 +47,9 @@ elm <- function(Y, X, lower = 0, upper = 1,
     X <- as.matrix(X)
     Y <- as.vector(Y)
 
+    XROWS <- nrow(X)
+    XCOLS <- ncol(X)
+
     if(any(apply(X, 2, is.constant1)) == FALSE)
         {
             warning("No intercept found, thus included.")
@@ -58,14 +63,25 @@ elm <- function(Y, X, lower = 0, upper = 1,
             stop("Some values of Y are not within the range [lower, upper]!")
         }
 
-    if(ncol(X) == 1)
-        {
-            stop("There is only one covariate, please add a constant.")
-        }
-
-    if(length(Y) != dim(X)[1])
+    if(length(Y) != XROWS)
         {
             stop("X and Y are of unequal length.")
+        }
+
+    m <- length(coefs)
+    if(m != length(nullvalue) & length(nullvalue) > 1)
+        {
+            stop("Number of tested coefficients and null values does not correspond!")
+        }
+
+    if(m > 1 & length(nullvalue) == 1)
+        {
+            nullvalue <- rep(nullvalue, times = m)
+        }
+
+    if(!is.null(upperbetabound) && upperbetabound == 0)
+        {
+            stop("Please set a reasonable value for the upperbetabound.")
         }
 
     ## NA options
@@ -101,7 +117,7 @@ elm <- function(Y, X, lower = 0, upper = 1,
             lower <- -1 * upper
             upper <- -1 * lower
             Y <- -1 * Y
-            betabarj <- -1 * betabarj
+            nullvalue <- -1 * nullvalue
             ## betaj <- -1 * betaj
             ## if(betaj >= betabarj)
             ##     {
@@ -112,10 +128,6 @@ elm <- function(Y, X, lower = 0, upper = 1,
         {
             stop("Please choose either alternative = 'greater' or 'less'.")
         }
-
-
-    XROWS <- nrow(X)
-    XCOLS <- ncol(X)
 
     Y <- Y /(upper - lower) ## puts Y in [ww,ww + 1] where ww = lower/(upper-lower)
     X <- X /(upper - lower) ## rescales X so that beta remains unchanged
@@ -134,9 +146,10 @@ elm <- function(Y, X, lower = 0, upper = 1,
             coefTests[[length(coefTests) + 1L]] <- testCoefficient(j = j, Y = Y, X = X,
                                                                    ww = ww,
                                                                    betahat = betahat,
-                                                                   betabarj = betabarj,
+                                                                   betabarj = nullvalue[coefs == j],
                                                                    alpha = alpha,
                                                                    upperbetabound = upperbetabound,
+                                                                   steppc = steppc,
                                                                    alternative = alternative,
                                                                    XROWS = XROWS,
                                                                    XCOLS = XCOLS, tau = tau,

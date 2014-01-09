@@ -20,7 +20,7 @@ betaj1 <- betabarj + 170
 
 ## step example
 n <- 150
-h <- 0.2
+h <- 0.1
 Y <- sample(c(0, 1), size = n, replace = TRUE)
 X <- cbind(1, runif(n = n) < h)
 alpha <- 0.05

@@ -1,7 +1,9 @@
 
 testCoefficient <- function(j, Y, X, ww,
-                            betahat, betabarj, alpha,
+                            betahat, betabarj,
+                            alpha,
                             upperbetabound,
+                            steppc,
                             alternative, XROWS, XCOLS,
                             tau, iterations,
                             qq, qqmm, lambda, lambdamm,
@@ -79,19 +81,19 @@ testCoefficient <- function(j, Y, X, ww,
                                               qqmm * taujmm_2_min),
                                           min(taumm_j[i]/taujmm_2_min,
                                               -qqmm * taujmm_2_min)),
-                     vector(mode = "double", length = 1))
+                       vector(mode = "double", length = 1))
 
     b <- XROWS * tauj_inf
     d <- vapply(1:XROWS,
                 function(i) (1 - lambda) * max(-tau_j[i] * ww,
                                                -tau_j[i] * (ww + 1)) + lambda * (tauj_inf - max(tau_j[i] * ww, tau_j[i] * (ww + 1))),
-                     vector(mode = "double", length = 1))
+                vector(mode = "double", length = 1))
     ds <- sum(d)
 
     bmm <- XROWS * taujmm_inf
     dmm <- vapply(1:XROWS, function(i) (1 - lambdamm) * max(-taumm_j[i] * ww,
                                                             -taumm_j[i] * (ww + 1)) + lambdamm * (taujmm_inf - max(taumm_j[i] * ww, taumm_j[i] * (ww + 1))),
-                     vector(mode = "double", length = 1))
+                  vector(mode = "double", length = 1))
     dsmm <- sum(dmm)
 
     ## ## ## ##
@@ -155,13 +157,15 @@ testCoefficient <- function(j, Y, X, ww,
 
     if(is.null(upperbetabound))
         {
-            upperbetabound <- 0.9 * findHighestBeta(Y, X, j)
-            cat("\nupper: ", upperbetabound)
+            upperbetabound <- 0.9 * findHighestBeta(Y, X, j, alternative)
+            ## cat("\nupper: ", upperbetabound)
 
         }
 
     optbetaj <- findMinTypeII(upperbetabound = upperbetabound,
-                              X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS,
+                              X = X, step = upperbetabound * steppc,
+                              alternative = alternative,
+                              ww = ww, XROWS = XROWS, XCOLS = XCOLS,
                               ej = ej, tau_jB = tau_jB, tauj_2 = tauj_2,
                               tau_j = tau_j, tauj_inf = tauj_inf,
                               betabarj = betabarj,
@@ -266,14 +270,14 @@ testCoefficient <- function(j, Y, X, ww,
                                           "(OLS) Estimate",
                                           "(MM) Estimate"),
                                    "Rejection", "chosen Test")
-}
-else
-    {
-        names(chosenTest) <- c("H_0", "theta", "Prob rejection",
-                               ifelse(minimizingTest == 2,
-                                      "(OLS) Estimate",
-                                      "(MM) Estimate"),
-                               "Rejection", "chosen Test")
+        }
+    else
+        {
+            names(chosenTest) <- c("H_0", "theta", "Prob rejection",
+                                   ifelse(minimizingTest == 2,
+                                          "(OLS) Estimate",
+                                          "(MM) Estimate"),
+                                   "Rejection", "chosen Test")
         }
 
     OLSNonstandardized <- list(NonstandardizedTests = OLSNonstandardizedTests,

@@ -65,8 +65,9 @@ print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
                 cat("----------- Coefficient:", lst$coefname,
                     paste(rep("-", times = 30 - nchar(lst$coefname)),
                           collapse = ""), "\n")
-                print(unlist(lst$chosenTest[1:3]), quote = FALSE, right = TRUE)
-                print(unlist(lst$chosenTest[4:6]), quote = FALSE, right = TRUE)
+                print(unlist(lst$chosenTest), quote = FALSE, right = TRUE)
+                ## print(unlist(lst$chosenTest[1:3]), quote = FALSE, right = TRUE)
+                ## print(unlist(lst$chosenTest[4:6]), quote = FALSE, right = TRUE)
                 cat("TypeII minimizing beta in the alternative: ", lst$betaj, sep = "")
                 cat("\n")
 
