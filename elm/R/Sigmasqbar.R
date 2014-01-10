@@ -23,7 +23,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                         sigmasqbar[1] <- tauj_2/4 - (1/XROWS) * (term1)^2
                     }
                 ## typeII
-                else if (type == "typeII")
+                else if(type == "typeII")
                     {
                         term1 <- betaj - (1/2) * sum(tau_j)
                         sigmasqbar[2] <- tauj_2/4 - (1/XROWS) * (term1)^2
@@ -43,7 +43,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                                          factorized = FALSE)$solution
                         sigmasqbar[1] <- sum((tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
                     }
-                else if (type == "typeII")
+                else if(type == "typeII")
                     {
                         ## typeII
                         c2 <- 1/max(Dmat) ## NEW

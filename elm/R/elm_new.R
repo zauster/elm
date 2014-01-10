@@ -8,13 +8,13 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
-## source("NonstandardizedTest.R")
-## source("BernoulliTest.R")
-## source("TypeIIOptimization.R")
-## source("testCoefficient.R")
-## source("Sigmasqbar.R")
-## source("miscfun.R")
-## source("print.elm.R")
+source("NonstandardizedTest.R")
+source("BernoulliTest.R")
+source("TypeIIOptimization.R")
+source("testCoefficient.R")
+source("Sigmasqbar.R")
+source("miscfun.R")
+source("print.elm.R")
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
@@ -46,15 +46,14 @@ elm <- function(Y, X, lower = 0, upper = 1,
     X <- as.matrix(X)
     Y <- as.vector(Y)
 
-    XROWS <- nrow(X)
-    XCOLS <- ncol(X)
-
     if(any(apply(X, 2, is.constant1)) == FALSE)
         {
             warning("No intercept found, thus included.")
             X <- cbind(1, X)
         }
 
+    XROWS <- nrow(X)
+    XCOLS <- ncol(X)
     bounds <- paste("[", lower, ", ", upper, "]", sep = "")
 
     if(min(Y) < lower | max(Y) > upper)
@@ -102,26 +101,12 @@ elm <- function(Y, X, lower = 0, upper = 1,
         }
 
     ## adjustments to deal with both inequalities
-    if(alternative == "greater")
-        ## if(IE == "<=")
-        {
-            ## if(betaj <= betabarj)
-            ##     {
-            ##         stop("Please choose a betaj > betabarj.")
-            ##     }
-        }
-    else if(alternative == "less")
-        ## else if(IE == ">=")
+    if(alternative == "less")
         {
             lower <- -1 * upper
             upper <- -1 * lower
             Y <- -1 * Y
             nullvalue <- -1 * nullvalue
-            ## betaj <- -1 * betaj
-            ## if(betaj >= betabarj)
-            ##     {
-            ##         stop("Please choose a betaj < betabarj.")
-            ##     }
         }
     else
         {

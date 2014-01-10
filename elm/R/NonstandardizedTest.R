@@ -60,7 +60,7 @@ calcNonstandardizedTest <- function(tauj_2, tauj_inf, alpha,
                          lower = lowerBE, upper = c(10, 10))
         ## control = list(fnscale = 1))
         BE <- (BEtype1$value/1000 < alpha)
-        while(BE)
+        while(BE == TRUE)
             {
                 BEtype1 <- optim(wb1start, minBerryEsseenbound, gr = NULL,
                                  sigmasqbar = sigmasqbar,
@@ -132,17 +132,31 @@ calcTypeIINonstandardized <- function(wb1start,
         typeII <- rep(1, 5)
         names(typeII) <- c("Berry-Esseen", "Cantelli", "Bhattacharyya",
                            "Hoeffding", "Pinelis")
+        ## cat("\nsigma: ", sigmasqbar)
+        ## cat("\nbetaj: ", betaj)
+        ## cat("\ntbar: ", tbarmin, "\n")
 
         if(betaj > betabarj + tbarmin)
             {
                 ## Berry-Esseen
-                typeII[1] <- optim(wb1start, minBerryEsseenbound, gr = NULL,
+                typeII[1] <- try(optim(wb1start, minBerryEsseenbound, gr = NULL,
                                    sigmasqbar = sigmasqbar,
                                    tauj_inf = tauj_inf,
                                    tbar = betaj - betabarj - tbarmin,
                                    method = "L-BFGS-B",
                                    lower = lowerBE, upper = c(10,10),
-                                   control = list(fnscale = 1))$value/1000
+                                   control = list(fnscale = 1))$value/1000,
+                                 silent = FALSE)
+                ## if(is.error(typeIIBE) == TRUE)
+                ##     {
+                ##         print("here")
+                ##         print(typeIIBE)
+                ##         typeIIBE <- 1
+                ##     }
+                ## ## print(typeIIBE)
+                ## ## str(typeIIBE)
+                ## ## print(is.error(typeII[1]))
+                ## typeII[1] <- typeIIBE
 
                 ## Cantelli
                 typeII[2] <- (sigmasqbar)/(sigmasqbar + (betaj - betabarj - tbarmin)^2)
@@ -159,6 +173,8 @@ calcTypeIINonstandardized <- function(wb1start,
                 typeII[5] <- factorial(5) * (exp(1)/5)^5 * (1 - pnorm(2 * (betaj - betabarj - tbarmin)/sqrt(tauj_2)))
 
                 typeII[typeII > 1] <- 1
+                ## print(typeII)
+
             }
 
         return(typeII)
