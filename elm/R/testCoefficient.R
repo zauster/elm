@@ -16,7 +16,7 @@ testCoefficient <- function(j, Y, X, ww,
                                              "<=", ">="),
                             betabarj)
     betahatj <- betahat[j]
-    cat("\nbetahatj: ", betahatj)
+    ## cat("\nbetahatj: ", betahatj)
     tau_j <- tau[,j]
     tauj_2 <- sum((tau_j)^2)
     tauj_inf <- max(abs(tau_j))
@@ -66,7 +66,7 @@ testCoefficient <- function(j, Y, X, ww,
     taumm_j <- sol$solution
     taumm_j <- taumm_j[1:XROWS]
     betahatjmm = crossprod(taumm_j, Y)
-    cat("\nbetahatjmm: ", betahatjmm)
+    ## cat("\nbetahatjmm: ", betahatjmm)
     taujmm_2 = sum((taumm_j)^2)
     taujmm_inf = max(abs(taumm_j))
 

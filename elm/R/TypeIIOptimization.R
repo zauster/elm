@@ -32,7 +32,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                   alpha = alpha,
                                                   ds = ds, b = b,
                                                   XROWS = XROWS)$typeII
-        names(OLSBernoulliTypeII) <- "Bernoulli (OLS)"
+        names(OLSBernoulliTypeII) <- "      Bernoulli (OLS)"
 
         ## MM Nonstandardized
         sigmasqbarMM <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
@@ -58,7 +58,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                  alpha = alpha,
                                                  ds = dsmm, b = bmm,
                                                  XROWS = XROWS)$typeII
-        names(MMBernoulliTypeII) <- "Bernoulli (MM)"
+        names(MMBernoulliTypeII) <- "       Bernoulli (MM)"
 
         res <- c(OLSNonstandardizedTypeII,
                  OLSBernoulliTypeII,
@@ -95,7 +95,7 @@ findMinTypeII <- function(upperbetabound, X, iter = 0, step,
         ##         betainterval <- c(betabarj, -upperbetabound)
         ##     }
 
-        cat("\nbetainteral:", betainterval, "\n")
+        ## cat("\nbetainteral:", betainterval, "\n")
 
         res <- try(uniroot(minTypeII,
                            interval = betainterval,
