@@ -35,10 +35,10 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
         rej <- mean(r_alphaprimeWbar1(Wbars, XROWS, kbar, pbar, alphabar))
         error <- exp(-2 * iterations * (rej - theta)^2)
 
-        return(list(prob_rejection = rej,
-                    theta = theta,
-                    error = error,
-                    typeII = Bernoulliparameter$typeII))
+        return(list(Prob_rejection = rej,
+                    Theta = theta,
+                    Error = error,
+                    TypeII = Bernoulliparameter$typeII))
     }
 
 calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)

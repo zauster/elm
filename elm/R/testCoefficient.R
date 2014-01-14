@@ -14,7 +14,12 @@ testCoefficient <- function(j, Y, X, ww,
                        paste("beta_", j, sep = ""))
     nullHypothesis <- paste(COEFNAME, ifelse(alternative == "greater",
                                              "<=", ">="),
-                            betabarj)
+                            ifelse(alternative == "less", -betabarj,
+                                   betabarj))
+
+    ej <- rep(0, times = XCOLS)
+    ej[j] <- 1
+
     betahatj <- betahat[j]
     ## cat("\nbetahatj: ", betahatj)
     tau_j <- tau[,j]
@@ -24,9 +29,6 @@ testCoefficient <- function(j, Y, X, ww,
     ## tauOLS <- list(j = tau[, j],
     ##                sq = sum(tau[, j]^2),
     ##                inf = max(abs(tau[, j])))
-
-    ej <- rep(0, times = XCOLS)
-    ej[j] <- 1
 
     ## Finding upper bound on standard deviation of estimator:
     ## adjusting tau_j st Dmat positive definite,
@@ -43,6 +45,10 @@ testCoefficient <- function(j, Y, X, ww,
                                         min(tau_j[i]/tauj_inf_min001,
                                             -qq * tauj_inf_min1)),
                      vector(mode = "double", length = 1))
+
+    DmatOLS <- 2 * t(X) %*% ((tau_jB^2) * X)
+    dvecOLS <- (1 + 2 * ww) * colMeans((tau_jB^2) * X) * XROWS
+    Amat <- t(matrix(rbind(-1 * t(ej), X, -X), ncol = XCOLS))
 
     ##
     ## MM Estimate
@@ -85,6 +91,9 @@ testCoefficient <- function(j, Y, X, ww,
                                               -qqmm * taujmm_2_min)),
                        vector(mode = "double", length = 1))
 
+    DmatMM <- 2 * t(X) %*% ((taumm_jB^2) * X)
+    dvecMM <- (1 + 2 * ww) * colMeans((taumm_jB^2) * X) * XROWS
+
     b <- XROWS * tauj_inf
     d <- vapply(1:XROWS,
                 function(i) (1 - lambda) * max(-tau_j[i] * ww,
@@ -113,6 +122,9 @@ testCoefficient <- function(j, Y, X, ww,
                                     tau_jB = tau_jB,
                                     tauj_2 = tauj_2,
                                     tau_j = tau_j,
+                                    Dmat = DmatOLS,
+                                    dvec = dvecOLS,
+                                    Amat = Amat,
                                     betabarj = betabarj,
                                     betaj = betaj,
                                     type = "typeI")
@@ -134,6 +146,9 @@ testCoefficient <- function(j, Y, X, ww,
                                    tau_jB = taumm_jB,
                                    tauj_2 = taujmm_2,
                                    tau_j = taumm_j,
+                                   Dmat = DmatMM,
+                                   dvec = dvecMM,
+                                   Amat = Amat,
                                    betabarj = betabarj,
                                    betaj = betaj,
                                    type = "typeI")
@@ -141,7 +156,7 @@ testCoefficient <- function(j, Y, X, ww,
                                                       tauj_inf = taujmm_inf,
                                                       alpha = alpha,
                                                       sigmasqbar = sigmasqbarMM["TypeI"])
-    tbarMM <- min(OLSNonstandardizedTests)
+    tbarMM <- min(MMNonstandardizedTests)
 
 
     ##
@@ -173,10 +188,13 @@ testCoefficient <- function(j, Y, X, ww,
                               betabarj = betabarj,
                               tbarmin = tbarOLS,
                               alpha = alpha, ds = ds, b = b,
+                              DmatOLS = DmatOLS, dvecOLS = dvecOLS,
+                              Amat = Amat,
                               taumm_jB = taumm_jB, taujmm_2 = taujmm_2,
                               taujmm_inf = taujmm_inf,
                               tbarminmm = tbarMM,
                               dsmm = dsmm, bmm = bmm,
+                              DmatMM = DmatMM, dvecMM = dvecMM,
                               silent = silent)$root
 
     TypeII <- minTypeII(betaj = optbetaj,
@@ -186,14 +204,27 @@ testCoefficient <- function(j, Y, X, ww,
                         betabarj = betabarj,
                         tbarmin = tbarOLS,
                         alpha = alpha, ds = ds, b = b,
+                        DmatOLS = DmatOLS, dvecOLS = dvecOLS,
+                        Amat = Amat,
                         taumm_jB = taumm_jB, taujmm_2 = taujmm_2,
                         taujmm_inf = taujmm_inf,
                         tbarminmm = tbarMM,
-                        dsmm = dsmm, bmm = bmm)
+                        dsmm = dsmm, bmm = bmm,
+                        DmatMM = DmatMM, dvecMM = dvecMM)
 
-    sigmasqbarOLS <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                                    tau_jB, tauj_2, tau_j,
-                                    betabarj, betaj = optbetaj,
+    sigmasqbarOLS <- calcSigmasqbar(X = X,
+                                    ww = ww,
+                                    XROWS = XROWS,
+                                    XCOLS = XCOLS,
+                                    ej = ej,
+                                    tau_jB = tau_jB,
+                                    tauj_2 = tauj_2,
+                                    tau_j = tau_j,
+                                    Dmat = DmatOLS,
+                                    dvec = dvecOLS,
+                                    Amat = Amat,
+                                    betabarj = betabarj,
+                                    betaj = optbetaj,
                                     type = "typeII")
     OLSNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                           lowerBE = rep(10^-6, 2),
@@ -218,10 +249,27 @@ testCoefficient <- function(j, Y, X, ww,
                                           alternative = alternative,
                                           iterations = iterations)
 
-    sigmasqbarMM <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                                   taumm_jB, taujmm_2, taujmm_inf,
-                                   betabarj, betaj = optbetaj,
+    ## browser()
+    sigmasqbarMM <- calcSigmasqbar(X = X,
+                                   ww = ww,
+                                   XROWS = XROWS,
+                                   XCOLS = XCOLS,
+                                   ej = ej,
+                                   tau_jB = taumm_jB,
+                                   tauj_2 = taujmm_2,
+                                   tau_j = taumm_j,
+                                   Dmat = DmatMM,
+                                   dvec = dvecMM,
+                                   Amat = Amat,
+                                   betabarj = betabarj,
+                                   betaj = optbetaj,
                                    type = "typeII")
+    ## cat("\nsigmasqbarMM TypeII: ", sigmasqbarMM)
+    ## sigmasqbarMM["TypeII"] <- 0.0115402
+    ## cat("\nsigmasqbarMM TypeII: ", sigmasqbarMM, "\n")
+    ## cat(optbetaj)
+    ## cat(betabarj)
+    ## cat(tbarMM)
     MMNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                          lowerBE = rep(10^-6, 2),
                                                          sigmasqbar = sigmasqbarMM["TypeII"],
@@ -250,19 +298,19 @@ testCoefficient <- function(j, Y, X, ww,
                       {c(tbarOLS,
                          betahatj - betabarj)
                    },
-                      {c(OLSBernoulliTest$theta,
-                         OLSBernoulliTest$prob_rejection)
+                      {c(OLSBernoulliTest$Theta,
+                         OLSBernoulliTest$Prob_rejection)
                    },
                       {c(tbarMM,
                          betahatj - betabarj)
                    },
-                      {c(MMBernoulliTest$theta,
-                         MMBernoulliTest$prob_rejection)})
+                      {c(MMBernoulliTest$Theta,
+                         MMBernoulliTest$Prob_rejection)})
 
     chosenTest <- list(nullHypothesis,
                        results[1],
                        results[2],
-                       betahatj,
+                       ifelse(alternative == "less", -1, 1),
                        ifelse(results[1] < results[2], "Yes", "No"),
                        names(TypeII)[minimizingTest])
     if(minimizingTest == 1 | minimizingTest == 3)
@@ -272,6 +320,7 @@ testCoefficient <- function(j, Y, X, ww,
                                           "(OLS) Estimate",
                                           "(MM) Estimate"),
                                    "Rejection", "chosen Test")
+            chosenTest[4] <- chosenTest[[4]] * betahatj
         }
     else
         {
@@ -280,6 +329,8 @@ testCoefficient <- function(j, Y, X, ww,
                                           "(OLS) Estimate",
                                           "(MM) Estimate"),
                                    "Rejection", "chosen Test")
+            chosenTest[4] <- chosenTest[[4]] * betahatjmm
+
         }
 
     OLSNonstandardized <- list(NonstandardizedTests = OLSNonstandardizedTests,
@@ -293,8 +344,10 @@ testCoefficient <- function(j, Y, X, ww,
 
     res <- list(j = j,
                 coefname = COEFNAME,
-                betabarj = betabarj,
-                betaj = optbetaj,
+                betabarj = ifelse(alternative == "less", -betabarj,
+                    betabarj),
+                betaj = ifelse(alternative == "less", -optbetaj,
+                    optbetaj),
                 tbars = c(tbarOLS = tbarOLS,
                     tbarMM = tbarMM),
                 chosenTest = chosenTest,

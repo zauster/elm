@@ -8,13 +8,13 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
-## source("NonstandardizedTest.R")
-## source("BernoulliTest.R")
-## source("TypeIIOptimization.R")
-## source("testCoefficient.R")
-## source("Sigmasqbar.R")
-## source("miscfun.R")
-## source("print.elm.R")
+source("NonstandardizedTest.R")
+source("BernoulliTest.R")
+source("TypeIIOptimization.R")
+source("testCoefficient.R")
+source("Sigmasqbar.R")
+source("miscfun.R")
+source("print.elm.R")
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
@@ -107,18 +107,19 @@ elm <- function(Y, X, lower = 0, upper = 1,
         }
     else if(alternative == "less")
         {
-            lower <- -1 * upper
+            lower.new <- -1 * upper
             upper <- -1 * lower
+            lower <- lower.new
             Y <- -1 * Y
             nullvalue <- -1 * nullvalue
         }
-    else
+    else if(alternative != "two.sided")
         {
-            stop("Please choose either alternative = 'greater' or 'less'.")
+            stop("Please choose either alternative = 'greater', 'less' or 'two.sided'.")
         }
 
-    Y <- Y /(upper - lower) ## puts Y in [ww,ww + 1] where ww = lower/(upper-lower)
-    X <- X /(upper - lower) ## rescales X so that beta remains unchanged
+    YY <- Y /(upper - lower) ## puts Y in [ww,ww + 1] where ww = lower/(upper-lower)
+    XX <- X /(upper - lower) ## rescales X so that beta remains unchanged
     ww <- lower/(upper - lower)
 
     ##
@@ -129,25 +130,72 @@ elm <- function(Y, X, lower = 0, upper = 1,
     tau <- X %*% solve(crossprod(X))
 
     coefTests <- list()
-    for(j in coefs)
+    if(alternative != "two.sided")
         {
-            coefTests[[length(coefTests) + 1L]] <- testCoefficient(j = j, Y = Y, X = X,
-                                                                   ww = ww,
-                                                                   betahat = betahat,
-                                                                   betabarj = nullvalue[coefs == j],
-                                                                   alpha = alpha,
-                                                                   upperbetabound = upperbetabound,
-                                                                   steppc = steppc,
-                                                                   alternative = alternative,
-                                                                   XROWS = XROWS,
-                                                                   XCOLS = XCOLS, tau = tau,
-                                                                   iterations = iterations,
-                                                                   qq = qq, qqmm = qqmm,
-                                                                   lambda = lambda,
-                                                                   lambdamm = lambdamm,
-                                                                   silent = silent)
+            for(j in coefs)
+                {
+                    coefTests[[length(coefTests) + 1L]] <- testCoefficient(j = j, Y = YY, X = XX,
+                                                                           ww = ww,
+                                                                           betahat = betahat,
+                                                                           betabarj = nullvalue[coefs == j],
+                                                                           alpha = alpha,
+                                                                           upperbetabound = upperbetabound[coefs == j],
+                                                                           steppc = steppc,
+                                                                           alternative = alternative,
+                                                                           XROWS = XROWS,
+                                                                           XCOLS = XCOLS, tau = tau,
+                                                                           iterations = iterations,
+                                                                           qq = qq, qqmm = qqmm,
+                                                                           lambda = lambda,
+                                                                           lambdamm = lambdamm,
+                                                                           silent = silent)
+                }
         }
-
+    else
+        {
+            for(j in coefs)
+                {
+                    res.upper <- testCoefficient(j = j, Y = YY, X = XX,
+                                                 ww = ww,
+                                                 betahat = betahat,
+                                                 betabarj = nullvalue[coefs == j],
+                                                 alpha = alpha/2,
+                                                 upperbetabound = upperbetabound[coefs == j],
+                                                 steppc = steppc,
+                                                 alternative = alternative,
+                                                 XROWS = XROWS,
+                                                 XCOLS = XCOLS, tau = tau,
+                                                 iterations = iterations,
+                                                 qq = qq, qqmm = qqmm,
+                                                 lambda = lambda,
+                                                 lambdamm = lambdamm,
+                                                 silent = silent)
+                    lower.new <- -1 * upper
+                    upper <- -1 * lower
+                    lower <- lower.new
+                    Y <- -1 * Y
+                    nullvalue <- -1 * nullvalue
+                    YY <- Y /(upper - lower) ## puts Y in [ww,ww + 1] where ww = lower/(upper-lower)
+                    XX <- X /(upper - lower) ## rescales X so that beta remains unchanged
+                    ww <- lower/(upper - lower)
+                    alternative <- "less"
+                    res.lower <- testCoefficient(j = j, Y = Y, X = X,
+                                                 ww = ww,
+                                                 betahat = betahat,
+                                                 betabarj = nullvalue[coefs == j],
+                                                 alpha = alpha/2,
+                                                 upperbetabound = upperbetabound[coefs == j],
+                                                 steppc = steppc,
+                                                 alternative = alternative,
+                                                 XROWS = XROWS,
+                                                 XCOLS = XCOLS, tau = tau,
+                                                 iterations = iterations,
+                                                 qq = qq, qqmm = qqmm,
+                                                 lambda = lambda,
+                                                 lambdamm = lambdamm,
+                                                 silent = silent)
+                }
+        }
     ##
     ## end
     ##

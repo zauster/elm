@@ -1,14 +1,15 @@
 
 minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                       tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
-                      alpha, ds, b,
+                      alpha, ds, b, DmatOLS, dvecOLS, Amat,
                       taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
-                      dsmm, bmm, root = FALSE)
+                      dsmm, bmm, DmatMM, dvecMM, root = FALSE)
     {
         ## OLS Nonstandardized
-        sigmasqbarOLS <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                                        tau_jB, tauj_2, tau_j,
-                                        betabarj, betaj,
+        sigmasqbarOLS <- calcSigmasqbar(X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS, ej = ej,
+                                        tau_jB = tau_jB, tauj_2 = tauj_2, tau_j = tau_j,
+                                        Dmat = DmatOLS, dvec = dvecOLS, Amat = Amat,
+                                        betabarj = betabarj, betaj = betaj,
                                         type = "typeII")
         ## cat(sigmasqbarOLS)
         ## cat("\nbeta_j: ", betaj)
@@ -33,11 +34,13 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                   ds = ds, b = b,
                                                   XROWS = XROWS)$typeII
         names(OLSBernoulliTypeII) <- "      Bernoulli (OLS)"
+        ## to ensure that output columns are equally spaced
 
         ## MM Nonstandardized
-        sigmasqbarMM <- calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                                       taumm_jB, taujmm_2, taujmm_inf,
-                                       betabarj, betaj,
+        sigmasqbarMM <- calcSigmasqbar(X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS, ej = ej,
+                                       tau_jB = taumm_jB, tauj_2 = taujmm_2, tau_j = taujmm_inf,
+                                       Dmat = DmatMM, dvec = dvecMM, Amat = Amat,
+                                       betabarj = betabarj, betaj = betaj,
                                        type = "typeII")
         ## cat("\nMM: ")
         MMNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
@@ -82,9 +85,9 @@ findMinTypeII <- function(upperbetabound, X, iter = 0, step,
                           alternative,
                           ww, XROWS, XCOLS, ej, tau_jB,
                           tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
-                          alpha, ds, b,
+                          alpha, ds, b, DmatOLS, dvecOLS, Amat,
                           taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
-                          dsmm, bmm, silent, root = TRUE)
+                          dsmm, bmm, DmatMM, dvecMM, silent, root = TRUE)
     {
         ## if(alternative == "greater")
         ##     {
@@ -92,22 +95,25 @@ findMinTypeII <- function(upperbetabound, X, iter = 0, step,
         ##     }
         ## else
         ##     {
-        ##         betainterval <- c(betabarj, -upperbetabound)
+        ##         betainterval <- c(betabarj, upperbetabound)
         ##     }
 
-        ## cat("\nbetainteral:", betainterval, "\n")
+        ## cat("\nbetainteral:", betainterval)
 
         res <- try(uniroot(minTypeII,
                            interval = betainterval,
-                           X = X, ww = ww, XROWS = XROWS, XCOLS =XCOLS,
-                           ej = ej,
+                           X = X, ww = ww,
+                           XROWS = XROWS, XCOLS = XCOLS, ej = ej,
                            tau_jB = tau_jB, tauj_2 = tauj_2, tau_j = tau_j,
                            tauj_inf = tauj_inf, betabarj = betabarj,
                            tbarmin = tbarmin,
                            alpha = alpha, ds = ds, b = b,
+                           DmatOLS = DmatOLS, dvecOLS = dvecOLS,
+                           Amat = Amat,
                            taumm_jB = taumm_jB, taujmm_2 = taujmm_2,
                            taujmm_inf = taujmm_inf, tbarminmm = tbarminmm,
-                           dsmm = dsmm, bmm = bmm, root = root,
+                           dsmm = dsmm, bmm = bmm,
+                           DmatMM = DmatMM, dvecMM = dvecMM, root = root,
                            tol = .Machine$double.eps^0.5),
                    silent = silent)
 
@@ -120,12 +126,21 @@ findMinTypeII <- function(upperbetabound, X, iter = 0, step,
                         ## cat("\niter: ", iter)
                         ## cat("\nupper2: ", upperbetabound + step)
                         res <- findMinTypeII(upperbetabound + step,
-                                             X, iter = iter, step = step, alternative,
-                                             ww, XROWS, XCOLS, ej, tau_jB,
-                                             tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
-                                             alpha, ds, b,
-                                             taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
-                                             dsmm, bmm, silent, root = TRUE)
+                                             X, iter = iter, step = step,
+                                             alternative = alternative,
+                                             ww = ww, XROWS = XROWS, XCOLS = XCOLS,
+                                             ej = ej, tau_jB = tau_jB,
+                                             tauj_2 = tauj_2, tau_j = tau_j,
+                                             tauj_inf = tauj_inf, betabarj = betabarj,
+                                             tbarmin = tbarmin,
+                                             alpha = alpha, ds = ds, b = b,
+                                             DmatOLS = DmatOLS, dvecOLS = dvecOLS,
+                                             Amat = Amat,
+                                             taumm_jB = taumm_jB, taujmm_2 = taujmm_2,
+                                             taujmm_inf = taujmm_inf, tbarminmm = tbarminmm,
+                                             dsmm = dsmm, bmm = bmm,
+                                             DmatMM = DmatMM, dvecMM = dvecMM,
+                                             silent = silent, root = TRUE)
                     }
                 else ## probably a error in solve.QP: No optimal beta found
                     {
@@ -149,23 +164,24 @@ findHighestBeta <- function(Y, X, j, alternative)
         res
     }
 
-findMinTypeII2 <- function(upperbetabound, X, ww, XROWS, XCOLS, ej, tau_jB,
-                           tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
-                           alpha, ds, b,
-                           taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
-                           dsmm, bmm, root = TRUE)
-    {
-        res <- optimize(minTypeII, c(betabarj, upperbetabound),
-                        X, ww, XROWS, XCOLS, ej,
-                        tau_jB, tauj_2, tau_j,
-                        tauj_inf, betabarj, tbarmin,
-                        alpha, ds, b,
-                        taumm_jB, taujmm_2,
-                        taujmm_inf, tbarminmm, dsmm, bmm, root = root,
-                        tol = .Machine$double.eps^0.5)
+## findMinTypeII2 <- function(upperbetabound, X, ww, XROWS, XCOLS, ej, tau_jB,
+##                            tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
+##                            alpha, ds, b, DmatOLS, dvecOLS, Amat,
+##                            taumm_jB, taujmm_2, taujmm_inf, tbarminmm,
+##                            dsmm, bmm, DmatMM, dvecMM, root = TRUE)
+##     {
+##         res <- optimize(minTypeII, c(betabarj, upperbetabound),
+##                         X, ww, XROWS, XCOLS, ej,
+##                         tau_jB, tauj_2, tau_j,
+##                         tauj_inf, betabarj, tbarmin,
+##                         alpha, ds, b, DmatOLS, dvecOLS, Amat,
+##                         taumm_jB, taujmm_2,
+##                         taujmm_inf, tbarminmm, dsmm, bmm,
+##                         DmatMM, dvecMM, root = root,
+##                         tol = .Machine$double.eps^0.5)
 
-        res
-    }
+##         res
+##     }
 
 
 

@@ -79,14 +79,14 @@ print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
                         print(format(lst$OLSNonstandardized$NonstandardizedTypeII,
                                      digits = digits), quote = FALSE, right = TRUE)
 
-                        cat("\nOLS Bernoulli:\n")
-                        print(format(lst$OLSBernoulli$BernoulliTest,
-                                     digits = digits), quote = FALSE, right = TRUE)
-
                         cat("\nMM Nonstandardized:\n")
                         print(format(lst$MMNonstandardized$NonstandardizedTests,
                                      digits = digits), quote = FALSE, right = TRUE)
                         print(format(lst$MMNonstandardized$NonstandardizedTypeII,
+                                     digits = digits), quote = FALSE, right = TRUE)
+
+                        cat("\nOLS Bernoulli:\n")
+                        print(format(lst$OLSBernoulli$BernoulliTest,
                                      digits = digits), quote = FALSE, right = TRUE)
 
                         cat("\nMM Bernoulli:\n")

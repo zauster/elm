@@ -2,6 +2,7 @@
 calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                            tau_jB,
                            tauj_2, tau_j,
+                           Dmat, dvec, Amat,
                            betabarj, betaj,
                            type = "typeI",
                            zero = 10^-12)
@@ -9,9 +10,10 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
         sigmasqbar <- vector(length = 2)
         names(sigmasqbar) <- c("TypeI", "TypeII")
 
-        Dmat <- 2 * t(X) %*% ((tau_jB^2) * X)
-        dvec <- (1 + 2 * ww) * colMeans((tau_jB^2) * X) * XROWS
-        Amat <- t(matrix(rbind(-1 * t(ej), X, -1 * X), ncol = XCOLS))
+        ## sigmas <<- sigmas + 1 ## to count all calls of calcSigma
+        ## Dmat <- 2 * t(X) %*% ((tau_jB^2) * X)
+        ## dvec <- (1 + 2 * ww) * colMeans((tau_jB^2) * X) * XROWS
+        ## Amat <- t(matrix(rbind(-1 * t(ej), X, -X), ncol = XCOLS))
 
         if(det(Dmat) <= zero)
             {
@@ -46,8 +48,9 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                 else if(type == "typeII")
                     {
                         ## typeII
+                        ## browser()
                         c2 <- 1/max(Dmat) ## NEW
-                        ## cat("\nbetaj: ", betaj)
+                        ## cat("\nc2: ", c2)
                         bvec <- as.vector(c(-1 * betaj,
                                             rep(ww, times = XROWS),
                                             rep(-(ww + 1), times = XROWS)))
@@ -73,18 +76,18 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
         sigmasqbar
     }
 
-calcSigmasqbar2 <- function(betaj, X, ww,
-                            XROWS, XCOLS, ej,
-                            tau_jB,
-                            tauj_2, tau_j,
-                            betabarj,
-                            type = "typeI",
-                            zero = 10^-12)
-    {
-        try(calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-                       tau_jB,
-                       tauj_2, tau_j,
-                       betabarj, betaj,
-                       type = "typeI",
-                       zero = 10^-12))
-    }
+## calcSigmasqbar2 <- function(betaj, X, ww,
+##                             XROWS, XCOLS, ej,
+##                             tau_jB,
+##                             tauj_2, tau_j,
+##                             betabarj,
+##                             type = "typeI",
+##                             zero = 10^-12)
+##     {
+##         try(calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
+##                        tau_jB,
+##                        tauj_2, tau_j,
+##                        betabarj, betaj,
+##                        type = "typeI",
+##                        zero = 10^-12))
+##     }
