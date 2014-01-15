@@ -158,27 +158,6 @@ testCoefficient <- function(j, Y, X, ww,
                                                       sigmasqbar = sigmasqbarMM["TypeI"])
     tbarMM <- min(MMNonstandardizedTests)
 
-
-    ##
-    ## TypeII Optimization
-    ##
-    ## find betaj that brings typeII to 0.5
-    ## limit <- findUpperLimit(betabarj, betabarj + 35 * abs(betahatj),
-    ##                         steps = 25, X = X, ww = ww,
-    ##                         XROWS = XROWS, XCOLS = XCOLS,
-    ##                         ej = ej,
-    ##                        tau_jB = tau_jB, tauj_2 = tauj_2, tau_j = tau_j,
-    ##                        betaj = betaj, type = "typeI",
-    ##                        zero = 10^-12)
-    ## cat("limit: ", limit)
-
-    if(is.null(upperbetabound))
-        {
-            upperbetabound <- 0.9 * findHighestBeta(Y, X, j, alternative)
-            ## cat("\nupper: ", upperbetabound)
-
-        }
-
     optbetaj <- findMinTypeII(upperbetabound = upperbetabound,
                               X = X, step = upperbetabound * steppc,
                               alternative = alternative,
@@ -311,7 +290,7 @@ testCoefficient <- function(j, Y, X, ww,
                        results[1],
                        results[2],
                        ifelse(alternative == "less", -1, 1),
-                       ifelse(results[1] < results[2], "Yes", "No"),
+                       ifelse(results[1] < results[2], TRUE, FALSE),
                        names(TypeII)[minimizingTest])
     if(minimizingTest == 1 | minimizingTest == 3)
         {
@@ -358,3 +337,22 @@ testCoefficient <- function(j, Y, X, ww,
                 MMBernoulli = MMBernoulli)
     res
 }
+
+findCI <- function(betabarj, j, Y, X, ww,
+                   betahat,
+                   alpha,
+                   upperbetabound,
+                   steppc,
+                   alternative, XROWS, XCOLS,
+                   tau, iterations,
+                   qq, qqmm, lambda, lambdamm,
+                   silent)
+    {
+        as.numeric(testCoefficient(j, Y, X, ww, betahat, betabarj,
+                                   alpha, upperbetabound,
+                                   steppc,
+                                   alternative, XROWS, XCOLS,
+                                   tau, iterations,
+                                   qq, qqmm, lambda, lambdamm,
+                                   silent)$chosenTest$Rejection) - 0.5
+    }

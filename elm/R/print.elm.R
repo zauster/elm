@@ -61,6 +61,8 @@ print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
                                                             digits = digits),
                                               digits = digits)
                     }
+                lst$chosenTest$Rejection <- ifelse(lst$chosenTest$Rejection == TRUE,
+                                                   "Yes", "No")
                 cat("\n")
                 cat("----------- Coefficient:", lst$coefname,
                     paste(rep("-", times = 30 - nchar(lst$coefname)),

@@ -71,7 +71,7 @@ calcNonstandardizedTest <- function(tauj_2, tauj_inf, alpha,
 
                 if(BEtype1$value/1000 > alpha)
                     {
-                        (BE <- FALSE)
+                        BE <- FALSE
                     }
                 else
                     {
@@ -139,14 +139,14 @@ calcTypeIINonstandardized <- function(wb1start,
         if(betaj > betabarj + tbarmin)
             {
                 ## Berry-Esseen
-                typeII[1] <- try(optim(wb1start, minBerryEsseenbound, gr = NULL,
+                typeII[1] <- optim(wb1start, minBerryEsseenbound, gr = NULL,
                                    sigmasqbar = sigmasqbar,
                                    tauj_inf = tauj_inf,
                                    tbar = betaj - betabarj - tbarmin,
                                    method = "L-BFGS-B",
                                    lower = lowerBE, upper = c(10,10),
-                                   control = list(fnscale = 1))$value/1000,
-                                 silent = FALSE)
+                                   control = list(fnscale = 1))$value/1000 ##,
+                                 ## silent = FALSE)
                 ## if(is.error(typeIIBE) == TRUE)
                 ##     {
                 ##         print("here")
