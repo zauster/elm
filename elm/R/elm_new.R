@@ -8,13 +8,13 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
-## source("NonstandardizedTest.R")
-## source("BernoulliTest.R")
-## source("TypeIIOptimization.R")
-## source("testCoefficient.R")
-## source("Sigmasqbar.R")
-## source("miscfun.R")
-## source("print.elm.R")
+source("NonstandardizedTest.R")
+source("BernoulliTest.R")
+source("TypeIIOptimization.R")
+source("testCoefficient.R")
+source("Sigmasqbar.R")
+source("miscfun.R")
+source("print.elm.R")
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
@@ -46,6 +46,18 @@ elm <- function(Y, X, lower = 0, upper = 1,
 
     X <- data.matrix(X)
     Y <- as.vector(Y)
+
+    ## NA options
+    switch(na.action,
+           na.omit = {complete <- complete.cases(cbind(Y, X))
+                      Y <- Y[complete]
+                      X <- X[complete, ]},
+           na.fail = {na.fail(Y)
+                      na.fail(X)},
+           na.pass = {},
+           na.exclude = {complete <- complete.cases(cbind(Y, X))
+                         Y <- Y[complete]
+                         X <- X[complete, ]})
 
     if(any(apply(X, 2, is.constant1)) == FALSE & intercept == TRUE)
         {
@@ -82,18 +94,6 @@ elm <- function(Y, X, lower = 0, upper = 1,
         {
             stop("Please set a reasonable value for the upperbetabound.")
         }
-
-    ## NA options
-    switch(na.action,
-           na.omit = {complete <- complete.cases(cbind(Y, X))
-                      Y <- Y[complete]
-                      X <- X[complete, ]},
-           na.fail = {na.fail(Y)
-                      na.fail(X)},
-           na.pass = {},
-           na.exclude = {complete <- complete.cases(cbind(Y, X))
-                         Y <- Y[complete]
-                         X <- X[complete, ]})
 
     ## check if X has full rank
     if(det(t(X) %*% X) == 0)
@@ -137,15 +137,19 @@ elm <- function(Y, X, lower = 0, upper = 1,
                 {
                     if(is.null(upperbetabound))
                         {
-                            upperbetabound <- 0.9 * findHighestBeta(YY, XX, j, alternative)
-                            ## cat("\nupper: ", upperbetabound)
+                            betabound <- 0.9 * findHighestBeta(YY, XX, j, alternative)
+                            ## cat("\nupper: ", betabound)
+                        }
+                    else
+                        {
+                            betabound <- upperbetabound[coefs == j]
                         }
                     coefTests[[length(coefTests) + 1L]] <- testCoefficient(j = j, Y = YY, X = XX,
                                                                            ww = ww,
                                                                            betahat = betahat,
                                                                            betabarj = nullvalue[coefs == j],
                                                                            alpha = alpha,
-                                                                           upperbetabound = upperbetabound,
+                                                                           upperbetabound = betabound,
                                                                            steppc = steppc,
                                                                            alternative = alternative,
                                                                            XROWS = XROWS,
@@ -155,36 +159,7 @@ elm <- function(Y, X, lower = 0, upper = 1,
                                                                            lambda = lambda,
                                                                            lambdamm = lambdamm,
                                                                            silent = silent)
-                    ## cat("\nCI\n")
-                    ## ## CI <- try(uniroot(findCI, interval = c(0, 2 * upperbetabound),
-                    ## ##               j = j, Y = YY, X = XX, ww = ww,
-                    ## ##               betahat = betahat, alpha = alpha,
-                    ## ##               upperbetabound = upperbetabound,
-                    ## ##               steppc = steppc, alternative = alternative,
-                    ## ##               XROWS = XROWS, XCOLS = XCOLS, tau = tau,
-                    ## ##               iterations = iterations, qq, qqmm, lambda, lambdamm,
-                    ## ##               silent), silent = T)
-                    ## ## print(CI)
-                    ## lower <- findCI(0, j, Y, X, ww,
-                    ##                 betahat,
-                    ##                 alpha,
-                    ##                 upperbetabound,
-                    ##                 steppc,
-                    ##                 alternative, XROWS, XCOLS,
-                    ##                 tau, iterations,
-                    ##                 qq, qqmm, lambda, lambdamm,
-                    ##                 silent)
-                    ## cat("\nlower: ", lower)
-                    ## upper <- findCI(2 * upperbetabound, j, Y, X, ww,
-                    ##                 betahat,
-                    ##                 alpha,
-                    ##                 upperbetabound,
-                    ##                 steppc,
-                    ##                 alternative, XROWS, XCOLS,
-                    ##                 tau, iterations,
-                    ##                 qq, qqmm, lambda, lambdamm,
-                    ##                 silent)
-                    ## cat("\nupper: ", upper)
+
                 }
         }
     else
@@ -193,13 +168,22 @@ elm <- function(Y, X, lower = 0, upper = 1,
                 {
                     ## cat("\nTwo.sided")
                     ## cat("\nupper: ", upper, "\tlower: ", lower, "\n")
-                    ## alpha <- alpha/2
+
+                    if(is.null(upperbetabound))
+                        {
+                            betabound <- 0.9 * findHighestBeta(YY, XX, j, alternative)
+                            ## cat("\nupper: ", betabound)
+                        }
+                    else
+                        {
+                            betabound <- upperbetabound[coefs == j]
+                        }
                     res.upper <- testCoefficient(j = j, Y = YY, X = XX,
                                                  ww = ww,
                                                  betahat = betahat,
                                                  betabarj = nullvalue[coefs == j],
                                                  alpha = alpha/2,
-                                                 upperbetabound = upperbetabound[coefs == j],
+                                                 upperbetabound = betabound,
                                                  steppc = steppc,
                                                  alternative = alternative,
                                                  XROWS = XROWS,
@@ -225,7 +209,7 @@ elm <- function(Y, X, lower = 0, upper = 1,
                                                  betahat = betahat,
                                                  betabarj = nullvalue[coefs == j],
                                                  alpha = alpha/2,
-                                                 upperbetabound = upperbetabound[coefs == j],
+                                                 upperbetabound = betabound,
                                                  steppc = steppc,
                                                  alternative = "less",
                                                  XROWS = XROWS,
@@ -236,17 +220,12 @@ elm <- function(Y, X, lower = 0, upper = 1,
                                                  lambdamm = lambdamm,
                                                  silent = silent)
 
-                    ## cat("\nupper\n")
-                    ## print(res.upper$chosenTest)
-                    ## cat("\nlower\n")
-                    ## print(res.lower$chosenTest)
-
                     if(res.upper$chosenTest$Rejection == res.lower$chosenTest$Rejection)
                         {
                             if(res.upper$chosenTest$'chosen Test' == res.upper$chosenTest$'chosen Test')
                                 {
                                     cat("\nSame same\n")
-                                    if(res.upper$chosenTest[[3]] > res.upper$chosenTest[[3]])
+                                    if(res.upper$chosenTest[[3]] > res.lower$chosenTest[[3]])
                                         {
                                             cat("\nUpper")
                                             res <- res.upper

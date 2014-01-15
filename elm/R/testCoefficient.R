@@ -176,6 +176,7 @@ testCoefficient <- function(j, Y, X, ww,
                               DmatMM = DmatMM, dvecMM = dvecMM,
                               silent = silent)$root
 
+    ## browser()
     TypeII <- minTypeII(betaj = optbetaj,
                         X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS,
                         ej = ej, tau_jB = tau_jB, tauj_2 = tauj_2,
@@ -327,6 +328,7 @@ testCoefficient <- function(j, Y, X, ww,
                     betabarj),
                 betaj = ifelse(alternative == "less", -optbetaj,
                     optbetaj),
+                betahatj = c(betahatj, betahatjmm),
                 tbars = c(tbarOLS = tbarOLS,
                     tbarMM = tbarMM),
                 chosenTest = chosenTest,
@@ -338,21 +340,23 @@ testCoefficient <- function(j, Y, X, ww,
     res
 }
 
-findCI <- function(betabarj, j, Y, X, ww,
-                   betahat,
-                   alpha,
-                   upperbetabound,
-                   steppc,
-                   alternative, XROWS, XCOLS,
-                   tau, iterations,
-                   qq, qqmm, lambda, lambdamm,
-                   silent)
-    {
-        as.numeric(testCoefficient(j, Y, X, ww, betahat, betabarj,
-                                   alpha, upperbetabound,
-                                   steppc,
-                                   alternative, XROWS, XCOLS,
-                                   tau, iterations,
-                                   qq, qqmm, lambda, lambdamm,
-                                   silent)$chosenTest$Rejection) - 0.5
-    }
+## findCI <- function(betabarj, j, Y, X, ww,
+##                    betahat,
+##                    alpha,
+##                    upperbetabound,
+##                    steppc,
+##                    alternative, XROWS, XCOLS,
+##                    tau, iterations,
+##                    qq, qqmm, lambda, lambdamm,
+##                    silent)
+##     {
+##         res <- testCoefficient(j, Y, X, ww, betahat, betabarj,
+##                                    alpha, upperbetabound,
+##                                    steppc,
+##                                    alternative, XROWS, XCOLS,
+##                                    tau, iterations,
+##                                    qq, qqmm, lambda, lambdamm,
+##                                    silent)$chosenTest
+##         res <- res[2] - res[3]
+##         res
+##     }

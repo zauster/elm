@@ -75,13 +75,15 @@ print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
 
                 if(x$verbose == TRUE)
                     {
-                        cat("\nOLS Nonstandardized:\n")
+                        cat("\nOLS Nonstandardized: (estimate = ",
+                            format(lst$betahatj[1], digits = digits), ")\n", sep = "")
                         print(format(lst$OLSNonstandardized$NonstandardizedTests,
                                      digits = digits), quote = FALSE, right = TRUE)
                         print(format(lst$OLSNonstandardized$NonstandardizedTypeII,
                                      digits = digits), quote = FALSE, right = TRUE)
 
-                        cat("\nMM Nonstandardized:\n")
+                        cat("\nMM Nonstandardized: (estimate = ",
+                            format(lst$betahatj[2], digits = digits), ")\n", sep = "")
                         print(format(lst$MMNonstandardized$NonstandardizedTests,
                                      digits = digits), quote = FALSE, right = TRUE)
                         print(format(lst$MMNonstandardized$NonstandardizedTypeII,

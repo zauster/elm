@@ -63,6 +63,8 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
         ##         k1 <- k1 + 1
         ##     }
         ## so k1 is this smallest k
+        ## cat("\n", k1, "\n")
+        ## cat(XROWS)
 
         if(k1 <= XROWS)
             {
@@ -101,6 +103,7 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
             {
                 TYPEII_B <- Inf
                 theta <- Inf
+                stop("What abount kbar, pbar and alphabar?")
             }
 
         return(list(typeII = ifelse(TYPEII_B < 1, TYPEII_B, 1),
