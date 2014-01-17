@@ -81,7 +81,8 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
         return(res)
     }
 
-findMinTypeII <- function(upperbetabound, X, iter = 0, step,
+findMinTypeII <- function(upperbetabound, fun = minTypeII,
+                          X, iter = 0, step,
                           alternative,
                           ww, XROWS, XCOLS, ej, tau_jB,
                           tauj_2, tau_j, tauj_inf, betabarj, tbarmin,
@@ -98,9 +99,9 @@ findMinTypeII <- function(upperbetabound, X, iter = 0, step,
         ##         betainterval <- c(betabarj, upperbetabound)
         ##     }
 
-        ## cat("\nbetainteral:", betainterval)
+        cat("\nbetainteral:", betainterval, "\n")
 
-        res <- try(uniroot(minTypeII,
+        res <- try(uniroot(fun,
                            interval = betainterval,
                            X = X, ww = ww,
                            XROWS = XROWS, XCOLS = XCOLS, ej = ej,
@@ -126,6 +127,7 @@ findMinTypeII <- function(upperbetabound, X, iter = 0, step,
                         ## cat("\niter: ", iter)
                         ## cat("\nupper2: ", upperbetabound + step)
                         res <- findMinTypeII(upperbetabound + step,
+                                             fun = fun,
                                              X, iter = iter, step = step,
                                              alternative = alternative,
                                              ww = ww, XROWS = XROWS, XCOLS = XCOLS,

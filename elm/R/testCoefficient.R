@@ -313,6 +313,17 @@ testCoefficient <- function(j, Y, X, ww,
 
         }
 
+    if(minimizingTest <= 2)
+        {
+            Dmat <- DmatOLS
+            dvec <- dvecOLS
+        }
+    else
+        {
+            Dmat <- DmatMM
+            dvec <- dvecMM
+        }
+
     OLSNonstandardized <- list(NonstandardizedTests = OLSNonstandardizedTests,
                                NonstandardizedTypeII = OLSNonstandardizedTypeII)
     OLSBernoulli <- list(BernoulliTest = OLSBernoulliTest,
@@ -321,6 +332,18 @@ testCoefficient <- function(j, Y, X, ww,
                               NonstandardizedTypeII = MMNonstandardizedTypeII)
     MMBernoulli <- list(BernoulliTest = MMBernoulliTest,
                         BernoulliTypeII = MMBernoulliTypeII)
+    model <- list(X = X,
+                  XROWS = XROWS,
+                  XCOLS = XCOLS,
+                  ww = ww,
+                  ej = ej,
+                  tau_jB = tau_jB, ## TODO: change if MM!
+                  tauj_2 = tauj_2,
+                  tau_j = tau_j,
+                  tauj_inf = tauj_inf,
+                  Dmat = Dmat,
+                  dvec = dvec,
+                  Amat = Amat)
 
     res <- list(j = j,
                 coefname = COEFNAME,
@@ -328,15 +351,19 @@ testCoefficient <- function(j, Y, X, ww,
                     betabarj),
                 betaj = ifelse(alternative == "less", -optbetaj,
                     optbetaj),
-                betahatj = c(betahatj, betahatjmm),
+                betahatj = c(OLS = betahatj,
+                    MM = betahatjmm),
                 tbars = c(tbarOLS = tbarOLS,
                     tbarMM = tbarMM),
                 chosenTest = chosenTest,
+                nullvalue = betabarj,
+                upperbetabound = upperbetabound,
                 typeIImatrix = TypeII,
                 OLSNonstandardized = OLSNonstandardized,
                 OLSBernoulli = OLSBernoulli,
                 MMNonstandardized = MMNonstandardized,
-                MMBernoulli = MMBernoulli)
+                MMBernoulli = MMBernoulli,
+                model = model)
     res
 }
 
