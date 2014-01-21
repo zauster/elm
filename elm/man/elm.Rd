@@ -17,6 +17,7 @@ elm(Y, X, lower = 0, upper = 1,
     qq = 0.0001, qqmm = 0.0001,
     iterations = 1000,
     steppc = 0.1,
+    intercept = TRUE,
     silent = FALSE,
     verbose = TRUE,
     na.action = getOption("na.action"))
@@ -39,10 +40,19 @@ elm(Y, X, lower = 0, upper = 1,
     the type I error.
 }
   \item{coefs}{
-    index of the coefficient to be tested
+    index of the coefficient to be tested. The program assumes that the
+  first coefficient (i.e. the first column) is the intercept, thus the
+  numbering of the coefficients begins with 2.
+  If a range of coefficients is given, e.g. \code{coefs = 2:4}, the program will
+  test all these coefficients.
 }
   \item{nullvalue}{
-    the critical value for the null hypothesis
+    the critical value for the null hypothesis. If a range of
+    coefficients is given (see above) and there is only one null value,
+    the program uses the same null value in all tests. If you want to
+  test different null values, you have to supply a vector of the same
+  length as the coefficients that you want to test. E.g. \code{coefs =
+  2:4, nullvalue = c(0, 0.3, -.7)}
 }
   \item{upperbetabound}{
     the upper bound of beta in the set of the alternative
@@ -51,12 +61,18 @@ elm(Y, X, lower = 0, upper = 1,
   \code{upperbetabound} is set to \code{NULL}, it will try to guess a
   usable \code{upperbetabound} and slowly increase (\code{steppc}
   controls the increases) it until it finds an
-  optimal beta. This could be, however, computationally expensive.
+  optimal beta. This can be, however, computationally expensive.
 }
 \item{steppc}{
   Controls the size of the steps taken in finding the optimal beta. The
   stepwise increase is \code{upperbetabound} * \code{steppc}. Default is
   0.1. 
+}
+\item{intercept}{
+  If set to \code{TRUE}, the program will look for an intercept in the
+  design matrix and will include one should there be no intercept. If
+  \code{FALSE}, the program will estimate the linear model without an
+  intercept. This is, however, not recommended.
 }
   \item{lambda}{
 %%     ~~Describe \code{lambda} here~~
@@ -65,7 +81,7 @@ elm(Y, X, lower = 0, upper = 1,
 %%     ~~Describe \code{lambdamm} here~~
 }
   \item{iterations}{
-    number of iterations
+    number of iterations of the Bernoulli Test
 }
   \item{qq}{
 %%     ~~Describe \code{qq} here~~

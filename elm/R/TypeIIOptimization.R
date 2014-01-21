@@ -99,7 +99,7 @@ findMinTypeII <- function(upperbetabound, fun = minTypeII,
         ##         betainterval <- c(betabarj, upperbetabound)
         ##     }
 
-        cat("\nbetainteral:", betainterval, "\n")
+        ## cat("\nbetainteral:", betainterval, "\n")
 
         res <- try(uniroot(fun,
                            interval = betainterval,

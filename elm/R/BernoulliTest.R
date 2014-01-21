@@ -4,6 +4,7 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
                               ww, Bernoulliparameter,
                               d, ds, b, a = 0, # betaj,
                               betabarj, alternative, iterations,
+                              zero = 10^-12,
                               lambda = 1)
     {
         ## if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
@@ -29,16 +30,30 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
 
         ## p0 <- 1 - p1
 
-        W <- vapply(1:XROWS, function(x) rbinom(n = iterations, size = 1, p1[x]),
-                    vector(mode = "double", length = 1000))
-        Wbars <- rowMeans(W)
-        rej <- mean(r_alphaprimeWbar1(Wbars, XROWS, kbar, pbar, alphabar))
-        error <- exp(-2 * iterations * (rej - theta)^2)
+        error <- 1
+        W <- NULL
+        i <- 1
+
+        while(error > zero & (iterations * i <= 100000))
+            {
+                W <- rbind(W,
+                           vapply(1:XROWS, function(x) rbinom(n = iterations, size = 1, p1[x]),
+                                     vector(mode = "double", length = iterations)))
+                Wbars <- rowMeans(W)
+                rej <- mean(r_alphaprimeWbar1(Wbars, XROWS, kbar, pbar, alphabar))
+                error <- exp(-2 * (iterations * i) * (rej - theta)^2)
+                i <- i + 1
+                ## cat("i: ", i - 1, "\n")
+            }
+
+        if((iterations * i >= 100000))
+            warning("The maximum number of iterations (100,000) was reached. Rejection may be very sensible to the choice of the parameters.")
 
         return(list(Prob_rejection = rej,
                     Theta = theta,
                     Error = error,
-                    TypeII = Bernoulliparameter$typeII))
+                    TypeII = Bernoulliparameter$typeII,
+                    Iterations = iterations * (i - 1)))
     }
 
 calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)

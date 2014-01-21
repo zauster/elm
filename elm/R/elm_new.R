@@ -8,13 +8,13 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
-source("NonstandardizedTest.R")
-source("BernoulliTest.R")
-source("TypeIIOptimization.R")
-source("testCoefficient.R")
-source("Sigmasqbar.R")
-source("miscfun.R")
-source("print.elm.R")
+## source("NonstandardizedTest.R")
+## source("BernoulliTest.R")
+## source("TypeIIOptimization.R")
+## source("testCoefficient.R")
+## source("Sigmasqbar.R")
+## source("miscfun.R")
+## source("print.elm.R")
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
@@ -51,13 +51,13 @@ elm <- function(Y, X, lower = 0, upper = 1,
     switch(na.action,
            na.omit = {complete <- complete.cases(cbind(Y, X))
                       Y <- Y[complete]
-                      X <- X[complete, ]},
+                      X <- data.matrix(X[complete, ])},
            na.fail = {na.fail(Y)
                       na.fail(X)},
            na.pass = {},
            na.exclude = {complete <- complete.cases(cbind(Y, X))
                          Y <- Y[complete]
-                         X <- X[complete, ]})
+                         X <- data.matrix(X[complete, ])})
 
     if(any(apply(X, 2, is.constant1)) == FALSE & intercept == TRUE)
         {
@@ -224,32 +224,32 @@ elm <- function(Y, X, lower = 0, upper = 1,
                         {
                             if(res.upper$chosenTest$'chosen Test' == res.upper$chosenTest$'chosen Test')
                                 {
-                                    cat("\nSame same\n")
+                                    ## cat("\nSame same\n")
                                     if(res.upper$chosenTest[[3]] > res.lower$chosenTest[[3]])
                                         {
-                                            cat("\nUpper")
+                                            ## cat("\nUpper")
                                             res <- res.upper
                                         }
                                     else
                                         {
-                                            cat("\nLower")
+                                            ## cat("\nLower")
                                             res <- res.lower
                                         }
                                 }
                             else
                                 {
-                                    cat("\nDifferent test for upper and lower bound!")
+                                    ## cat("\nDifferent test for upper and lower bound!")
                                     res <- res.upper
                                 }
                         }
                     else if(res.upper$chosenTest$Rejection == TRUE)
                         {
-                            cat("\nUpper")
+                            ## cat("\nUpper")
                             res <- res.upper
                         }
                     else
                         {
-                            cat("\nLower")
+                            ## cat("\nLower")
                             res <- res.lower
                         }
                     res$chosenTest$H_0 <- gsub(">", "!", res$chosenTest$H_0)
@@ -259,8 +259,6 @@ elm <- function(Y, X, lower = 0, upper = 1,
     ##
     ## end
 
-    ## guestj7
-    ## ecoguest
     method <- "Exact linear models"
     alpha <- ifelse(alternative == "two.sided",
                     paste(alpha/2, "(on both sides)"),

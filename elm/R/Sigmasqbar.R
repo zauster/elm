@@ -5,6 +5,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                            Dmat, dvec, Amat,
                            betabarj, betaj,
                            type = "typeI",
+                           silent = TRUE,
                            zero = 10^-12)
     {
         sigmasqbar <- vector(length = 2)
@@ -38,12 +39,29 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                                             rep(ww, times = XROWS),
                                             rep(-(ww + 1), times = XROWS)))
                         meq <- 0
-                        zsol <- solve.QP(Dmat = Dmat,
-                                         dvec = dvec,
-                                         Amat,
-                                         bvec = bvec, meq = meq,
-                                         factorized = FALSE)$solution
-                        sigmasqbar[1] <- sum((tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
+                        zsol <- try(solve.QP(Dmat = Dmat,
+                                             dvec = dvec,
+                                             Amat,
+                                             bvec = bvec, meq = meq,
+                                             factorized = FALSE)$solution,
+                                    silent = silent)
+                        if(is.error(zsol) == TRUE)
+                            {
+                                if(grepl("constraints are inconsistent", zsol[1]) == TRUE)
+                                    {
+                                        warning("Could not find the optimal value for sigmasqbar. Will use upper bound instead.")
+                                        term1 <- min(0, betabarj - (1/2) * sum(tau_j))
+                                        sigmasqbar[1] <- tauj_2/4 - (1/XROWS) * (term1)^2
+                                    }
+                                else
+                                    {
+                                        stop("Unusual error in finding optimal sigmasqbar. Please try other parameters")
+                                    }
+                            }
+                        else
+                            {
+                                sigmasqbar[1] <- sum((tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
+                            }
                     }
                 else if(type == "typeII")
                     {
@@ -56,11 +74,30 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                                             rep(-(ww + 1), times = XROWS)))
                         ## cat("\nbvec: ", bvec)
                         meq <- 1
-                        zsol <- solve.QP(Dmat = c2 * Dmat,
-                                         dvec = c2 * dvec,
-                                         Amat,
-                                         bvec = bvec, meq = meq,
-                                         factorized = FALSE)$solution
+                        zsol <- try(solve.QP(Dmat = c2 * Dmat,
+                                             dvec = c2 * dvec,
+                                             Amat,
+                                             bvec = bvec, meq = meq,
+                                             factorized = FALSE)$solution,
+                                    silent = silent)
+                        if(is.error(zsol) == TRUE)
+                            {
+                                if(grepl("constraints are inconsistent", zsol[1]) == TRUE)
+                                    {
+                                        warning("Could not find the optimal value for sigmasqbar. Will use upper bound instead.")
+                                        term1 <- betaj - (1/2) * sum(tau_j)
+                                        sigmasqbar[2] <- tauj_2/4 - (1/XROWS) * (term1)^2
+                                    }
+                                else
+                                    {
+                                        stop("Unusual error in finding optimal sigmasqbar. Please try other parameters")
+                                    }
+                            }
+                        else
+                            {
+                                sigmasqbar[2] <- sum((tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
+                            }
+
                         ## print(str(zsol))
                         ## cat("\nzsol: ", zsol)
                         ## if there is an error message
@@ -70,24 +107,7 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                         ## (Gossner and Schlag, 2013)
                         ## but can also come if betaj is not close enough to
                         ## 0
-                        sigmasqbar[2] <- sum((tau_j)^2 * ((X %*% zsol - ww) * (1 + ww - X %*% zsol)))
                     }
             }
         sigmasqbar
     }
-
-## calcSigmasqbar2 <- function(betaj, X, ww,
-##                             XROWS, XCOLS, ej,
-##                             tau_jB,
-##                             tauj_2, tau_j,
-##                             betabarj,
-##                             type = "typeI",
-##                             zero = 10^-12)
-##     {
-##         try(calcSigmasqbar(X, ww, XROWS, XCOLS, ej,
-##                        tau_jB,
-##                        tauj_2, tau_j,
-##                        betabarj, betaj,
-##                        type = "typeI",
-##                        zero = 10^-12))
-##     }
