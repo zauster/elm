@@ -4,7 +4,9 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
                               ww, Bernoulliparameter,
                               d, ds, b, a = 0, # betaj,
                               betabarj, alternative, iterations,
-                              zero = 10^-12,
+                              zero = 10^-6,
+                              max.iter = 50000,
+                              root = FALSE,
                               lambda = 1)
     {
         ## if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
@@ -34,7 +36,7 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
         W <- NULL
         i <- 1
 
-        while(error > zero & (iterations * i <= 100000))
+        while(error > zero & (iterations * i <= max.iter))
             {
                 W <- rbind(W,
                            vapply(1:XROWS, function(x) rbinom(n = iterations, size = 1, p1[x]),
@@ -46,19 +48,26 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
                 ## cat("i: ", i - 1, "\n")
             }
 
-        if((iterations * i >= 100000))
-            warning("The maximum number of iterations (100,000) was reached. Rejection may be very sensible to the choice of the parameters.")
+        if((iterations * i >= max.iter))
+            warning(paste("The maximum number of iterations (", max.iter, ") was reached. Rejection may be very sensible to the choice of the parameters.", sep = ""))
 
-        return(list(Prob_rejection = rej,
-                    Theta = theta,
-                    Error = error,
-                    TypeII = Bernoulliparameter$typeII,
-                    Iterations = iterations * (i - 1)))
+        if(root == FALSE)
+            {
+                return(list(Prob_rejection = rej,
+                            Theta = theta,
+                            Error = error,
+                            TypeII = Bernoulliparameter$typeII,
+                            Iterations = iterations * (i - 1)))
+            }
+        else
+            {
+                return(rej - theta)
+            }
     }
 
 calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
     {
-        pbar = (betabarj + ds - a)/(b - a)
+        pbar = min(1, (betabarj + ds - a)/(b - a))
 
         ## in this software we do not fix theta and then find kbar but instead
         ## we search among a set of kk and choose theta such that lamda=0
@@ -69,6 +78,7 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
 
         ## we first look for smallest k st Bkp(k,pbar) <= alpha and
         ## k >= pbar * XROWS + 1
+        ## cat("pbar: ", pbar)
 
         k1 <- floor(pbar * XROWS + 1)
         k1 <- k1 + sum(Bkp(k1:XROWS, pbar, XROWS) > alpha)
@@ -118,6 +128,9 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
             {
                 TYPEII_B <- Inf
                 theta <- Inf
+                ## kbar <- XROWS
+                ## pbar <- 1
+                ## alphabar <- 1
                 stop("What abount kbar, pbar and alphabar?")
             }
 

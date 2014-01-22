@@ -55,7 +55,9 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                                     }
                                 else
                                     {
-                                        stop("Unusual error in finding optimal sigmasqbar. Please try other parameters")
+                                        warning("WARNING: Unusual error in finding optimal sigmasqbar, will use upper bound instead. Are the parameters given sensible?")
+                                        term1 <- min(0, betabarj - (1/2) * sum(tau_j))
+                                        sigmasqbar[1] <- tauj_2/4 - (1/XROWS) * (term1)^2
                                     }
                             }
                         else
@@ -90,7 +92,9 @@ calcSigmasqbar <- function(X, ww, XROWS, XCOLS, ej,
                                     }
                                 else
                                     {
-                                        stop("Unusual error in finding optimal sigmasqbar. Please try other parameters")
+                                        warning("WARNING: Unusual error in finding optimal sigmasqbar, will use upper bound instead. Are the parameters given sensible?")
+                                        term1 <- betaj - (1/2) * sum(tau_j)
+                                        sigmasqbar[2] <- tauj_2/4 - (1/XROWS) * (term1)^2
                                     }
                             }
                         else

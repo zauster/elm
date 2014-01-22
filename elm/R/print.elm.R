@@ -77,15 +77,19 @@ print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
                     {
                         cat("\nOLS Nonstandardized: (estimate = ",
                             format(lst$betahatj[1], digits = digits), ")\n", sep = "")
+                        cat("Type I: \n")
                         print(format(lst$OLSNonstandardized$NonstandardizedTests,
                                      digits = digits), quote = FALSE, right = TRUE)
+                        cat("Type II: \n")
                         print(format(lst$OLSNonstandardized$NonstandardizedTypeII,
                                      digits = digits), quote = FALSE, right = TRUE)
 
                         cat("\nMM Nonstandardized: (estimate = ",
                             format(lst$betahatj[2], digits = digits), ")\n", sep = "")
+                        cat("Type I: \n")
                         print(format(lst$MMNonstandardized$NonstandardizedTests,
                                      digits = digits), quote = FALSE, right = TRUE)
+                        cat("Type II: \n")
                         print(format(lst$MMNonstandardized$NonstandardizedTypeII,
                                      digits = digits), quote = FALSE, right = TRUE)
 

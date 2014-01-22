@@ -20,9 +20,6 @@ elmCI <- function(elm, alpha = 0.05, coefs = 2)
                                                  elm = lst$model,
                                                  alpha = alpha)$root
                            cat("\nCI bound: ", res, "\n")
-
-
-
                        },
                        'Nonstandardized (MM)' = {
                            cat("2")
