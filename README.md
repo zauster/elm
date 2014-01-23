@@ -11,7 +11,7 @@ There are two ways to download the R-package:
 
 #### First option
 
-1. Download the **whole repository** with `Download ZIP` to your right
+1. Download the **whole repository** with `Download ZIP` at the right side of the files list.
 2. Go to the folder where you saved the .zip file
 3. Extract `elm-master.zip`
 4. Start R (or R-Studio or whatever you use)
