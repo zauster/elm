@@ -33,6 +33,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                   alpha = alpha,
                                                   ds = ds, b = b,
                                                   XROWS = XROWS)$typeII
+
         names(OLSBernoulliTypeII) <- "      Bernoulli (OLS)"
         ## to ensure that output columns are equally spaced
 
@@ -61,6 +62,9 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                  alpha = alpha,
                                                  ds = dsmm, b = bmm,
                                                  XROWS = XROWS)$typeII
+    ## cat("\nMM Bernoulli\n")
+    ## print(unlist(MMBernoulliTypeII))
+    ##     MMBernoulliTypeII <- MMBernoulliTypeII$typeII
         names(MMBernoulliTypeII) <- "       Bernoulli (MM)"
 
         res <- c(OLSNonstandardizedTypeII,

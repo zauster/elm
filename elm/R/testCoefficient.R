@@ -229,7 +229,7 @@ testCoefficient <- function(j, Y, X, ww,
                                           alternative = alternative,
                                           iterations = iterations)
 
-    ## browser()
+
     sigmasqbarMM <- calcSigmasqbar(X = X,
                                    ww = ww,
                                    XROWS = XROWS,
@@ -244,12 +244,7 @@ testCoefficient <- function(j, Y, X, ww,
                                    betabarj = betabarj,
                                    betaj = optbetaj,
                                    type = "typeII")
-    ## cat("\nsigmasqbarMM TypeII: ", sigmasqbarMM)
-    ## sigmasqbarMM["TypeII"] <- 0.0115402
-    ## cat("\nsigmasqbarMM TypeII: ", sigmasqbarMM, "\n")
-    ## cat(optbetaj)
-    ## cat(betabarj)
-    ## cat(tbarMM)
+
     MMNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                          lowerBE = rep(10^-6, 2),
                                                          sigmasqbar = sigmasqbarMM["TypeII"],
@@ -264,6 +259,8 @@ testCoefficient <- function(j, Y, X, ww,
                                              alpha = alpha,
                                              ds = dsmm, b = bmm,
                                              XROWS = XROWS)
+    ## cat("\nMM Bernoulli\n")
+    ## print(unlist(MMBernoulliTypeII))
     MMBernoulliTest <- calcBernoulliTest(Y = Y, XROWS = XROWS,
                                          tauj_inf = taujmm_inf,
                                          tau_j = taumm_j, ww = ww,
@@ -322,6 +319,14 @@ testCoefficient <- function(j, Y, X, ww,
         {
             Dmat <- DmatMM
             dvec <- dvecMM
+            ds <- dsmm
+            d <- dmm
+            b <- bmm
+            tau_jB <- taumm_jB
+            tauj_2 <- taujmm_2
+            tau_j <- taumm_j
+            tauj_inf <- taujmm_inf
+
         }
 
     OLSNonstandardized <- list(NonstandardizedTests = OLSNonstandardizedTests,
@@ -332,7 +337,8 @@ testCoefficient <- function(j, Y, X, ww,
                               NonstandardizedTypeII = MMNonstandardizedTypeII)
     MMBernoulli <- list(BernoulliTest = MMBernoulliTest,
                         BernoulliTypeII = MMBernoulliTypeII)
-    model <- list(X = X,
+    model <- list(Y = Y,
+                  X = X,
                   XROWS = XROWS,
                   XCOLS = XCOLS,
                   ww = ww,
@@ -343,7 +349,10 @@ testCoefficient <- function(j, Y, X, ww,
                   tauj_inf = tauj_inf,
                   Dmat = Dmat,
                   dvec = dvec,
-                  Amat = Amat)
+                  Amat = Amat,
+                  ds = ds,
+                  d = d,
+                  b = b)
 
     res <- list(j = j,
                 coefname = COEFNAME,

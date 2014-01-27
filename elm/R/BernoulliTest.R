@@ -65,9 +65,11 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
             }
     }
 
-calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
+calcTypeIIBernoulli <- function(betaj, betabarj,
+                                alpha, ds, b, XROWS, a = 0,
+                                root = FALSE)
     {
-        pbar = min(1, (betabarj + ds - a)/(b - a))
+        pbar = max(min(1, (betabarj + ds - a)/(b - a)), 0)
 
         ## in this software we do not fix theta and then find kbar but instead
         ## we search among a set of kk and choose theta such that lamda=0
@@ -88,8 +90,7 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
         ##         k1 <- k1 + 1
         ##     }
         ## so k1 is this smallest k
-        ## cat("\n", k1, "\n")
-        ## cat(XROWS)
+        cat("\nk1", k1, "\tpbar", pbar, "\tXROWS", XROWS)
 
         if(k1 <= XROWS)
             {
@@ -131,14 +132,21 @@ calcTypeIIBernoulli <- function(betaj, betabarj, alpha, ds, b, XROWS, a = 0)
                 ## kbar <- XROWS
                 ## pbar <- 1
                 ## alphabar <- 1
-                stop("What abount kbar, pbar and alphabar?")
+                stop("What about kbar, pbar and alphabar?")
             }
 
-        return(list(typeII = ifelse(TYPEII_B < 1, TYPEII_B, 1),
-                    theta = theta,
-                    kbar = kbar,
-                    pbar = pbar,
-                    alphabar = alphabar))
+        if(root == FALSE)
+            {
+                return(list(typeII = min(TYPEII_B, 1),
+                            theta = theta,
+                            kbar = kbar,
+                            pbar = pbar,
+                            alphabar = alphabar))
+            }
+        else
+            {
+                return(TYPEII_B - 0.5)
+            }
     }
 
 ## calcTypeIIBernoulliNew <- function(betaj, ds, b, kbar, theta)
