@@ -127,7 +127,7 @@ Karl Schlag, Olivier Gossner, Gareth Liu-Evans and Oliver Reiter
 \examples{
 ## step example
 n <- 40
-h <- 0.5
+h <- 0.7
 Y <- sample(c(0, 1), size = n, replace = TRUE)
 X <- cbind(1, runif(n = n) < h)
 elm(Y, X, 0, 1, coefs = 2, nullvalue = 0, upperbetabound = NULL)
