@@ -3,11 +3,13 @@
 calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
                               ww, Bernoulliparameter,
                               d, ds, b, a = 0, # betaj,
-                              betabarj, alternative, iterations,
+                              betabarj, alternative,
+                              iterations = 1000,
                               zero = 10^-6,
                               max.iter = 50000,
                               root = FALSE,
-                              lambda = 1)
+                              lambda = 1,
+                              dispWarnings = TRUE)
     {
         ## if(((betaj + ds - a)/(b - a) > 1) & (alternative == "greater"))
         ##     {
@@ -48,7 +50,7 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
                 ## cat("i: ", i - 1, "\n")
             }
 
-        if((iterations * i >= max.iter))
+        if((iterations * i >= max.iter) & dispWarnings == TRUE)
             warning(paste("The maximum number of iterations (", max.iter, ") was reached. Rejection may be very sensible to the choice of the parameters.", sep = ""))
 
         if(root == FALSE)
@@ -69,7 +71,7 @@ calcTypeIIBernoulli <- function(betaj, betabarj,
                                 alpha, ds, b, XROWS, a = 0,
                                 root = FALSE)
     {
-        pbar = max(min(1, (betabarj + ds - a)/(b - a)), 0)
+        pbar = max(0, min(1, (betabarj + ds - a)/(b - a)))
 
         ## in this software we do not fix theta and then find kbar but instead
         ## we search among a set of kk and choose theta such that lamda=0
@@ -90,7 +92,7 @@ calcTypeIIBernoulli <- function(betaj, betabarj,
         ##         k1 <- k1 + 1
         ##     }
         ## so k1 is this smallest k
-        cat("\nk1", k1, "\tpbar", pbar, "\tXROWS", XROWS)
+        ## cat("\nk1", k1, "\tpbar", pbar, "\tXROWS", XROWS)
 
         if(k1 <= XROWS)
             {

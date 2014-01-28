@@ -11,48 +11,96 @@
 ## set bounds correctly: if null rejected, right, else left
 ## silence when CI
 ## let user select which test to use, if not, use from nullvalue = 0
+## make BernoulliTest output a named vector instead of list [LOW]
 
-elmCI <- function(elm, alpha = 0.05, coefs = 2)
+elmCI <- function(elm, alpha = 0.05, coefs = 2,
+                  dispWarnings = FALSE,
+                  useTest = NULL)
     {
+        alternative <- elm$parameter$alternative
+
+        confidenceintervals <- list()
         for(lst in elm$coefTests)
             {
+                ## print(lst)
+                if(!is.null(useTest))
+                    {
+                        lst$chosenTest$'chosen Test' <- switch(useTest,
+                                                               {"Nonstandardized (OLS)"},
+                                                               {"      Bernoulli (OLS)"},
+                                                               {"Nonstandardized (MM)"},
+                                                               {"      Bernoulli (MM)"})
+                    }
+
                 switch(lst$chosenTest$'chosen Test',
                        'Nonstandardized (OLS)' = {
-                           cat("1\n")
+                           ## cat("1\n")
                            res <- findNonstandardizedCI(upperbetabound = lst$upperbetabound,
                                                         ## nullvalue =
                                                         ## lst$nullvalue,
                                                         nullvalue = 0,
                                                         betahatj = lst$betahatj[1],
-                                                        elm = lst$model,
+                                                        elm = lst$modelOLS,
                                                         alpha = alpha)$root
-                           cat("\nCI bound: ", res, "\n")
+                           ## cat("res: ", res, "\n")
+                           res <- ifelse(alternative == "greater", res,
+                                         lst$betahatj["OLS"] + (lst$betahatj["OLS"] - res))
+                           ## cat("\nCI bound:\n")
+                           ## return(res)
+                       },
+                       '      Bernoulli (OLS)' = {
+                           ## cat("2\n")
+                           res <- findBernoulliCI(upperbetabound = lst$upperbetabound,
+                                                  nullvalue = 0, #lst$nullvalue,
+                                                  betahatj = lst$betahatj[1],
+                                                  elm = lst$modelOLS,
+                                                  alpha = alpha,
+                                                  dispWarnings = dispWarnings)$root
+                           res <- ifelse(alternative == "greater",
+                                         res, -res)
                        },
                        'Nonstandardized (MM)' = {
-                           cat("2")
+                           ## cat("3\n")
+                           res <- findNonstandardizedCI(upperbetabound = lst$upperbetabound,
+                                                        ## nullvalue =
+                                                        ## lst$nullvalue,
+                                                        nullvalue = 0,
+                                                        betahatj = lst$betahatj[2],
+                                                        elm = lst$modelMM,
+                                                        alpha = alpha)$root
+                           res <- ifelse(alternative == "greater",
+                                         res, lst$betahatj["MM"] + (lst$betahatj["MM"] - res))
                        },
-                       '       Bernoulli (OLS)' = {
-                           cat("3")
-                       },
-                       '       Bernoulli (MM)' = {
-                           cat("4")
+                       '      Bernoulli (MM)' = {
+                           ## cat("4\n")   #
                            res <- findBernoulliCI(upperbetabound = lst$upperbetabound,
                                                   nullvalue = 0, #lst$nullvalue,
                                                   betahatj = lst$betahatj[2],
-                                                  elm = lst$model,
-                                                  alpha = alpha)$root
-                           cat("\nCI bound: ", res, "\n")
+                                                  elm = lst$modelMM,
+                                                  alpha = alpha,
+                                                  dispWarnings = dispWarnings)$root
+                           ## cat("res: ", res, "\n")
+                           res <- ifelse(alternative == "greater",
+                                         res, -res)
+                           ## cat("\nCI bound:\n")
+                           ## return(res)
                        })
+
+                confidenceintervals[[length(confidenceintervals) + 1L]] <- res
             }
+
+        return(confidenceintervals)
     }
+
 
 findBernoulliCI <- function(upperbetabound, nullvalue, betahatj,
                             elm, iter = 0,
                             step = 0.05 * upperbetabound,
-                            alternative, alpha)
+                            alternative, alpha,
+                            dispWarnings = FALSE)
     {
         betainterval <- c(-upperbetabound, nullvalue)
-        cat("\nbetainterval 1: ", betainterval)
+        ## cat("\nbetainterval 1: ", betainterval)
 
         res <- try(uniroot(calcBernoulliCI,
                            interval = betainterval,
@@ -60,7 +108,8 @@ findBernoulliCI <- function(upperbetabound, nullvalue, betahatj,
                            upperbetabound = upperbetabound,
                            elm = elm,
                            alternative = alternative,
-                           alpha = alpha),
+                           alpha = alpha,
+                           dispWarnings = dispWarnings),
                    silent = TRUE)
 
         if(is.error(res) == TRUE)
@@ -73,8 +122,11 @@ findBernoulliCI <- function(upperbetabound, nullvalue, betahatj,
                         res <- findBernoulliCI(upperbetabound = upperbetabound + step,
                                                nullvalue = nullvalue,
                                                betahatj = betahatj,
-                                               elm = elm, alpha = alpha,
-                                               iter = iter)
+                                               elm = elm,
+                                               iter = iter,
+                                               alternative = alternative,
+                                               alpha = alpha,
+                                               dispWarnings = dispWarnings)
                     }
                 else
                     {
@@ -92,10 +144,11 @@ calcBernoulliCI <- function(nullvalue, betahatj,
                             zero = 10^-6,
                             max.iter = 5000,
                             lambda = 1,
-                            root = TRUE)
+                            root = TRUE,
+                            dispWarnings = FALSE)
     {
         betainterval <- c(nullvalue, upperbetabound)
-        cat("\nbetainterval 2: ", betainterval)
+        ## cat("\nbetainterval 2: ", betainterval)
         optbetaj <- uniroot(calcTypeIIBernoulli,
                             interval = betainterval,
                             betabarj = nullvalue,
@@ -103,6 +156,7 @@ calcBernoulliCI <- function(nullvalue, betahatj,
                             ds = elm$ds, b = elm$b,
                             XROWS = elm$XROWS,
                             root = root)$root
+        ## cat("\noptbetaj: ", optbetaj)
         BernoulliTypeII <- calcTypeIIBernoulli(betaj = optbetaj,
                                                betabarj = nullvalue,
                                                alpha = alpha,
@@ -123,7 +177,8 @@ calcBernoulliCI <- function(nullvalue, betahatj,
                                  zero = 10^-6,
                                  max.iter = 5000,
                                  root = root,
-                                 lambda = 1)
+                                 lambda = 1,
+                                 dispWarnings = dispWarnings)
         res
     }
 
@@ -188,5 +243,6 @@ calcNonstandardizedCI <- function(nullvalue, betahatj,
         ## cat("\nbetahat: ", betahatj)
 
         res <- tbar - (betahatj - nullvalue)
+        ## res <- tbar - (nullvalue - betahatj)
         res
     }

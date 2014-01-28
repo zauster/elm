@@ -65,7 +65,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
     ## cat("\nMM Bernoulli\n")
     ## print(unlist(MMBernoulliTypeII))
     ##     MMBernoulliTypeII <- MMBernoulliTypeII$typeII
-        names(MMBernoulliTypeII) <- "       Bernoulli (MM)"
+        names(MMBernoulliTypeII) <- "      Bernoulli (MM)"
 
         res <- c(OLSNonstandardizedTypeII,
                  OLSBernoulliTypeII,

@@ -271,6 +271,12 @@ testCoefficient <- function(j, Y, X, ww,
                                          iterations = iterations)
 
     minimizingTest <- which.min(TypeII)
+    ## Order of Tests:
+    ## 1: OLS Nonstandardized
+    ## 2: OLS Bernoulli
+    ## 3: MM Nonstandardized
+    ## 4: MM Bernoulli
+
     results <- switch(minimizingTest,
                       {c(tbarOLS,
                          betahatj - betabarj)
@@ -290,14 +296,16 @@ testCoefficient <- function(j, Y, X, ww,
                        ifelse(alternative == "less", -1, 1),
                        ifelse(results[1] < results[2], TRUE, FALSE),
                        names(TypeII)[minimizingTest])
-    if(minimizingTest == 1 | minimizingTest == 3)
+
+    if(minimizingTest == 1 | minimizingTest == 3) ## if Nonstandardized
         {
             names(chosenTest) <- c("H_0", "tbar", "Test Statistic",
                                    ifelse(minimizingTest == 1,
                                           "(OLS) Estimate",
                                           "(MM) Estimate"),
                                    "Rejection", "chosen Test")
-            chosenTest[4] <- chosenTest[[4]] * betahatj
+            chosenTest[4] <- chosenTest[[4]] * ifelse(minimizingTest == 1,
+                                                      betahatj, betahatjmm)
         }
     else
         {
@@ -306,28 +314,29 @@ testCoefficient <- function(j, Y, X, ww,
                                           "(OLS) Estimate",
                                           "(MM) Estimate"),
                                    "Rejection", "chosen Test")
-            chosenTest[4] <- chosenTest[[4]] * betahatjmm
+            chosenTest[4] <- chosenTest[[4]] * ifelse(minimizingTest == 2,
+                                                      betahatj, betahatjmm)
 
         }
 
-    if(minimizingTest <= 2)
-        {
-            Dmat <- DmatOLS
-            dvec <- dvecOLS
-        }
-    else
-        {
-            Dmat <- DmatMM
-            dvec <- dvecMM
-            ds <- dsmm
-            d <- dmm
-            b <- bmm
-            tau_jB <- taumm_jB
-            tauj_2 <- taujmm_2
-            tau_j <- taumm_j
-            tauj_inf <- taujmm_inf
+    ## if(minimizingTest <= 2)
+    ##     {
+    ##         Dmat <- DmatOLS
+    ##         dvec <- dvecOLS
+    ##     }
+    ## else
+    ##     {
+    ##         Dmat <- DmatMM
+    ##         dvec <- dvecMM
+    ##         ds <- dsmm
+    ##         d <- dmm
+    ##         b <- bmm
+    ##         tau_jB <- taumm_jB
+    ##         tauj_2 <- taujmm_2
+    ##         tau_j <- taumm_j
+    ##         tauj_inf <- taujmm_inf
 
-        }
+    ##     }
 
     OLSNonstandardized <- list(NonstandardizedTests = OLSNonstandardizedTests,
                                NonstandardizedTypeII = OLSNonstandardizedTypeII)
@@ -337,22 +346,38 @@ testCoefficient <- function(j, Y, X, ww,
                               NonstandardizedTypeII = MMNonstandardizedTypeII)
     MMBernoulli <- list(BernoulliTest = MMBernoulliTest,
                         BernoulliTypeII = MMBernoulliTypeII)
-    model <- list(Y = Y,
-                  X = X,
-                  XROWS = XROWS,
-                  XCOLS = XCOLS,
-                  ww = ww,
-                  ej = ej,
-                  tau_jB = tau_jB, ## TODO: change if MM!
-                  tauj_2 = tauj_2,
-                  tau_j = tau_j,
-                  tauj_inf = tauj_inf,
-                  Dmat = Dmat,
-                  dvec = dvec,
-                  Amat = Amat,
-                  ds = ds,
-                  d = d,
-                  b = b)
+    modelOLS <- list(Y = Y,
+                     X = X,
+                     XROWS = XROWS,
+                     XCOLS = XCOLS,
+                     ww = ww,
+                     ej = ej,
+                     tau_jB = tau_jB,
+                     tauj_2 = tauj_2,
+                     tau_j = tau_j,
+                     tauj_inf = tauj_inf,
+                     Dmat = DmatOLS,
+                     dvec = dvecOLS,
+                     Amat = Amat,
+                     ds = ds,
+                     d = d,
+                     b = b)
+    modelMM <- list(Y = Y,
+                     X = X,
+                     XROWS = XROWS,
+                     XCOLS = XCOLS,
+                     ww = ww,
+                     ej = ej,
+                     tau_jB = taumm_jB, ## TODO: change if MM!
+                     tauj_2 = taujmm_2,
+                     tau_j = taumm_j,
+                     tauj_inf = taujmm_inf,
+                     Dmat = DmatMM,
+                     dvec = dvecMM,
+                     Amat = Amat,
+                     ds = dsmm,
+                     d = dmm,
+                     b = bmm)
 
     res <- list(j = j,
                 coefname = COEFNAME,
@@ -361,7 +386,7 @@ testCoefficient <- function(j, Y, X, ww,
                 betaj = ifelse(alternative == "less", -optbetaj,
                     optbetaj),
                 betahatj = c(OLS = betahatj,
-                    MM = betahatjmm),
+                    MM = betahatjmm) * ifelse(alternative == "less", -1, 1),
                 tbars = c(tbarOLS = tbarOLS,
                     tbarMM = tbarMM),
                 chosenTest = chosenTest,
@@ -372,7 +397,8 @@ testCoefficient <- function(j, Y, X, ww,
                 OLSBernoulli = OLSBernoulli,
                 MMNonstandardized = MMNonstandardized,
                 MMBernoulli = MMBernoulli,
-                model = model)
+                modelOLS = modelOLS,
+                modelMM = modelMM)
     res
 }
 

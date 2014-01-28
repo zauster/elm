@@ -1,58 +1,31 @@
 ##
-## non-verbose:
 ##
-##        Exact linear models
-##
-## data: Y and X
-##
-## Tested coefficients:
-##        H_0     Estimate     Threshold    Test statistic
-## weight > 0         1.23          0.23              0.08
-##                             Rejection       chosen Test
-##                                    No         Bernoulli
-##
-##        H_0     Estimate     Threshold    Test statistic
-## gender > 0         3.89          12.5              18.4
-##                             Rejection       chosen Test
-##                                   Yes         Hoeffding
-##
-## parameter:
-##    Y in [0, 10]
-##    alpha: 0.05
-##    iterations: 1000
-
-## verbose:
-##        Exact linear models
+##         Confidence intervals for exact linear models
 ##
 ## data: Y and X
+## n = 195, m = 7
+## Number of tested coefficients: 1
 ##
-## Tested coefficients:
-##         H_0     Estimate     Threshold    Test statistic
-## weight <= 0         1.23          0.23              0.08
-##                              Rejection       chosen Test
-##                                     No         Bernoulli
-##       betaj         Test     Threshold            TypeII
-##        1.42    Bernoulli          0.23              0.50
-##        1.42    Hoeffding          3.44              0.54
-##        1.42     Cantelli         13.93              0.56
-##        ...
+## ----------- Coefficient: distance ----------------------
+##             estimate           lower             upper
+##  distance     0.1534         -0.1023            0.3211
 ##
-##
-## parameter:
-##    Y in [0, 10]
-##    alpha: 0.05
-##    iterations: 1000
 
-
-print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
+print.elm <- function(x, ..., verbose = NULL,
+                      digits = max(3L, getOption("digits") - 3L))
     {
         cat("\n")
         cat(strwrap(x$method, prefix = "\t"), sep="\n")
         cat("\n")
         cat("data:", x$yname, "and", x$xname, "\n")
         cat("n = ", x$parameter$n, ", m = ", x$parameter$m, "\n", sep = "")
+        cat("Number of tested coefficients:", length(x$coefTests), "\n")
 
-        cat("Tested coefficients:", length(x$coefTests), "\n")
+        if(!is.null(verbose) & is.logical(verbose))
+            {
+                x$verbose <- verbose
+            }
+
         for(lst in x$coefTests)
             {
                 for(i in 2:4)
@@ -75,29 +48,29 @@ print.elm <- function(x, ..., digits = max(3L, getOption("digits") - 3L))
 
                 if(x$verbose == TRUE)
                     {
-                        cat("\nOLS Nonstandardized: (estimate = ",
+                        cat("\nOLS based: \t(estimate = ",
                             format(lst$betahatj[1], digits = digits), ")\n", sep = "")
-                        cat("Type I: \n")
+                        cat("Nonstandardized Type I: \n")
                         print(format(lst$OLSNonstandardized$NonstandardizedTests,
                                      digits = digits), quote = FALSE, right = TRUE)
-                        cat("Type II: \n")
+                        cat("Nonstandardized Type II: \n")
                         print(format(lst$OLSNonstandardized$NonstandardizedTypeII,
                                      digits = digits), quote = FALSE, right = TRUE)
 
-                        cat("\nMM Nonstandardized: (estimate = ",
-                            format(lst$betahatj[2], digits = digits), ")\n", sep = "")
-                        cat("Type I: \n")
-                        print(format(lst$MMNonstandardized$NonstandardizedTests,
-                                     digits = digits), quote = FALSE, right = TRUE)
-                        cat("Type II: \n")
-                        print(format(lst$MMNonstandardized$NonstandardizedTypeII,
-                                     digits = digits), quote = FALSE, right = TRUE)
-
-                        cat("\nOLS Bernoulli:\n")
+                        cat("\nBernoulli:\n")
                         print(format(lst$OLSBernoulli$BernoulliTest,
                                      digits = digits), quote = FALSE, right = TRUE)
 
-                        cat("\nMM Bernoulli:\n")
+                        cat("\nMM based: \t(estimate = ",
+                            format(lst$betahatj[2], digits = digits), ")\n", sep = "")
+                        cat("Nonstandardized Type I: \n")
+                        print(format(lst$MMNonstandardized$NonstandardizedTests,
+                                     digits = digits), quote = FALSE, right = TRUE)
+                        cat("Nonstandardized Type II: \n")
+                        print(format(lst$MMNonstandardized$NonstandardizedTypeII,
+                                     digits = digits), quote = FALSE, right = TRUE)
+
+                        cat("\nBernoulli:\n")
                         print(format(lst$MMBernoulli$BernoulliTest,
                                      digits = digits), quote = FALSE, right = TRUE)
                     }
