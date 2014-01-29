@@ -88,7 +88,7 @@ elmCI(result.lower, alpha = 0.025)
 
 ## now upper bound:
 result.upper <- elm(Y, X, 0, 1, coefs = 2, nullvalue = 0, upperbetabound =
-  NULL, alternative = "greater")
+  NULL, alternative = "less")
 ## see what the results look like
 result.upper
 ## compute upper bound for the coefficient
