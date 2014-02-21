@@ -27,9 +27,13 @@ calcBernoulliTest <- function(Y, XROWS, tauj_inf, tau_j,
         Z <- XROWS * (tau_j * Y + d)
         p1 <- (Z - a)/(b - a)
 
+        ## print(summary(p1))
+        ## print(max(p1), digits = 10)
+        ## cat(max(p1) > 1, "\n")
         if(max(p1) > 1)
             {
-                stop(paste("largest p1 = ", round(max(p1), 4), ", has to be < 1 "))
+                warning(paste("largest p1 = ", max(p1), ", has to be < 1 ")) ## was a "stop"
+                p1[p1 >= 1] <- 1L
             }
 
         ## p0 <- 1 - p1

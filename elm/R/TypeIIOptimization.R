@@ -14,7 +14,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
         ## cat(sigmasqbarOLS)
         ## cat("\nbeta_j: ", betaj)
 
-        ## cat("\nOLS: ")
+        cat("\n\nOLS: ")
         OLSNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                               lowerBE = rep(10^-6, 2),
                                                               sigmasqbar = sigmasqbarOLS["TypeII"],
@@ -23,7 +23,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                               tbarmin = tbarmin,
                                                               tauj_2 = tauj_2,
                                                               tauj_inf = tauj_inf)
-        ## cat("\n", OLSNonstandardizedTypeII)
+        cat(OLSNonstandardizedTypeII)
         OLSNonstandardizedTypeII <- min(OLSNonstandardizedTypeII)
         names(OLSNonstandardizedTypeII) <- "Nonstandardized (OLS)"
 
@@ -43,7 +43,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                        Dmat = DmatMM, dvec = dvecMM, Amat = Amat,
                                        betabarj = betabarj, betaj = betaj,
                                        type = "typeII")
-        ## cat("\nMM: ")
+        cat("\n\nMM: ")
         MMNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                              lowerBE = rep(10^-6, 2),
                                                              sigmasqbar = sigmasqbarMM["TypeII"],
@@ -52,7 +52,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                              tbarmin = tbarminmm,
                                                              tauj_2 = taujmm_2,
                                                              tauj_inf = taujmm_inf)
-        ## cat("\n", MMNonstandardizedTypeII)
+        cat(MMNonstandardizedTypeII)
         MMNonstandardizedTypeII <- min(MMNonstandardizedTypeII)
         names(MMNonstandardizedTypeII) <- "Nonstandardized (MM)"
 
@@ -103,7 +103,7 @@ findMinTypeII <- function(upperbetabound, fun = minTypeII,
         ##         betainterval <- c(betabarj, upperbetabound)
         ##     }
 
-        ## cat("\nbetainteral:", betainterval, "\n")
+        ## cat("\nNEW ITERATION\nbetainteral:", betainterval, "\n")
 
         res <- try(uniroot(fun,
                            interval = betainterval,
@@ -119,7 +119,7 @@ findMinTypeII <- function(upperbetabound, fun = minTypeII,
                            taujmm_inf = taujmm_inf, tbarminmm = tbarminmm,
                            dsmm = dsmm, bmm = bmm,
                            DmatMM = DmatMM, dvecMM = dvecMM, root = root,
-                           tol = .Machine$double.eps^0.5),
+                           tol = .Machine$double.eps),
                    silent = silent)
 
         if(is.error(res) == TRUE)

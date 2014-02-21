@@ -8,23 +8,23 @@
 ## It also tests H0: betaj >= betabarj against H1: betaj < betabarj.
 ## (coded alternative = "less")
 
-## source("NonstandardizedTest.R")
-## source("BernoulliTest.R")
-## source("TypeIIOptimization.R")
-## source("testCoefficient.R")
-## source("Sigmasqbar.R")
-## source("miscfun.R")
-## source("print.elm.R")
-## source("ConfidenceIntervals.R")
-## library(Rglpk)
-## library(quadprog)
+source("NonstandardizedTest.R")
+source("BernoulliTest.R")
+source("TypeIIOptimization.R")
+source("testCoefficient.R")
+source("Sigmasqbar.R")
+source("miscfun.R")
+source("print.elm.R")
+source("ConfidenceIntervals.R")
+library(Rglpk)
+library(quadprog)
 
 elm <- function(Y, X, lower = 0, upper = 1,
                 alternative = "greater",
                 alpha = 0.05,
                 coefs = 2, ## coefficients to be tested
                 nullvalue = 0, ## the threshold value in the null hypothesis
-                upperbetabound = 1,
+                upperbetabound = NULL,
                 lambda = 1, lambdamm = 1,
                 qq = 0.0001, qqmm = 0.0001,
                 iterations = 1000,
@@ -38,17 +38,18 @@ elm <- function(Y, X, lower = 0, upper = 1,
     ## require(Rglpk)
     ## require(quadprog)
 
+    cat(is.null(upperbetabound))
     ## for prettier output
     YNAME <- deparse(substitute(Y))
     XNAME <- deparse(substitute(X))
 
-    if(is.data.frame(X) == TRUE)
-        {
-            X <- data.matrix(X)
-        }
+    ## if(is.data.frame(X) == TRUE)
+    ##     {
+    ##         X <- data.matrix(X)
+    ##     }
 
     X <- data.matrix(X)
-    Y <- as.vector(Y)
+    Y <- as.vector(data.matrix(Y))
 
     ## NA options
     switch(na.action,

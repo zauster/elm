@@ -85,18 +85,19 @@ calcNonstandardizedTest <- function(tauj_2, tauj_inf, alpha,
 
 minBerryEsseenbound <- function(wb, sigmasqbar, tauj_inf, tbar)
     {
-        ## if(sigmasqbar < 2 * (wb[1])^2)
-        ##     {
-        ##         (R <- tauj_inf * sigmasqbar/(sigmasqbar + (wb[1])^2)^(3/2))
-        ##     }
-        ## else
-        ##     {
-        ##         (R <- 2 * tauj_inf/((27^0.5) * wb[1]))
-        ##     }
-        R <- ifelse(sigmasqbar < 2 * wb[1]^2,
-                    tauj_inf * sigmasqbar/(sigmasqbar + (wb[1])^2)^(3/2),
-                    2 * tauj_inf/((27^0.5) * wb[1]))
+        if(sigmasqbar < 2 * (wb[1])^2)
+            {
+                R <- tauj_inf * sigmasqbar/(sigmasqbar + (wb[1])^2)^(3/2)
+            }
+        else
+            {
+                R <- 2 * tauj_inf/((27^0.5) * wb[1])
+            }
+        ## R <- ifelse(sigmasqbar < 2 * wb[1]^2,
+        ##             tauj_inf * sigmasqbar/(sigmasqbar + (wb[1])^2)^(3/2),
+        ##             2 * tauj_inf/((27^0.5) * wb[1]))
         res <- 1000 * (1 - pnorm((tbar - wb[2])/(sigmasqbar + wb[1]^2)^0.5) + 0.56 * R)/pnorm(wb[2]/wb[1])
+
         res
     }
 
@@ -132,9 +133,9 @@ calcTypeIINonstandardized <- function(wb1start,
         typeII <- rep(1, 5)
         names(typeII) <- c("Berry-Esseen", "Cantelli", "Bhattacharyya",
                            "Hoeffding", "Pinelis")
-        ## cat("\nsigma: ", sigmasqbar)
-        ## cat("\nbetaj: ", betaj)
-        ## cat("\ntbar: ", tbarmin, "\n")
+        cat("\nsigma: ", sigmasqbar)
+        cat("\nbetaj: ", betaj)
+        cat("\ntbar: ", tbarmin, "\n")
 
         if(betaj > betabarj + tbarmin)
             {
@@ -179,12 +180,3 @@ calcTypeIINonstandardized <- function(wb1start,
 
         return(typeII)
     }
-
-## findOptimalBetajTypeIINonstandardized <- function(betaj)
-##     {
-##         typeII <- calcTypeIINonstandardized(wb1start, lowerBE,
-##                                         sigmasqbar,
-##                                         betaj = betaj, betabarj,
-##                                         tbarmin, tauj_2)
-##         return(typeII[which.min(typeII)] - 0.5)
-##     }

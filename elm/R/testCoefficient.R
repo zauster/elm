@@ -128,6 +128,7 @@ testCoefficient <- function(j, Y, X, ww,
                                     betabarj = betabarj,
                                     betaj = betaj,
                                     type = "typeI")
+    cat("tauj2:", tauj_2, "\n")
     OLSNonstandardizedTests <- calcNonstandardizedTest(tauj_2 = tauj_2,
                                                        tauj_inf = tauj_inf,
                                                        alpha = alpha,
@@ -158,6 +159,7 @@ testCoefficient <- function(j, Y, X, ww,
                                                       sigmasqbar = sigmasqbarMM["TypeI"])
     tbarMM <- min(MMNonstandardizedTests)
 
+    cat("\nMINIMIZATION GOING ON:\n")
     optbetaj <- findMinTypeII(upperbetabound = upperbetabound,
                               X = X, step = upperbetabound * steppc,
                               alternative = alternative,
@@ -175,7 +177,7 @@ testCoefficient <- function(j, Y, X, ww,
                               dsmm = dsmm, bmm = bmm,
                               DmatMM = DmatMM, dvecMM = dvecMM,
                               silent = silent)$root
-
+    cat("\nMIMIZATION FINISHED\n")
     ## browser()
     TypeII <- minTypeII(betaj = optbetaj,
                         X = X, ww = ww, XROWS = XROWS, XCOLS = XCOLS,
