@@ -133,9 +133,9 @@ calcTypeIINonstandardized <- function(wb1start,
         typeII <- rep(1, 5)
         names(typeII) <- c("Berry-Esseen", "Cantelli", "Bhattacharyya",
                            "Hoeffding", "Pinelis")
-        cat("\nsigma: ", sigmasqbar)
-        cat("\nbetaj: ", betaj)
-        cat("\ntbar: ", tbarmin, "\n")
+        ## cat("\nsigma: ", sigmasqbar)
+        ## cat("\nbetaj: ", betaj)
+        ## cat("\ntbar: ", tbarmin, "\n")
 
         if(betaj > betabarj + tbarmin)
             {

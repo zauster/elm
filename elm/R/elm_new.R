@@ -37,8 +37,10 @@ elm <- function(Y, X, lower = 0, upper = 1,
     ## check required packages
     ## require(Rglpk)
     ## require(quadprog)
+    elmCall <- match.call()
+    print(elmCall)
 
-    cat(is.null(upperbetabound))
+    ## cat(is.null(upperbetabound))
     ## for prettier output
     YNAME <- deparse(substitute(Y))
     XNAME <- deparse(substitute(X))

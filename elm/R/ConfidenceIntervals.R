@@ -13,16 +13,23 @@
 ## let user select which test to use, if not, use from nullvalue = 0
 ## make BernoulliTest output a named vector instead of list [LOW]
 
-elmCI <- function(elm, alpha = 0.05, coefs = 2,
+elmCI <- function(elm, alpha = 0.025, coefs = 2,
                   dispWarnings = FALSE,
                   useTest = NULL)
     {
         alternative <- elm$parameter$alternative
+        ## if(alternative == "less")
+        ##     {
+        ##         stop("Not implemented yet. Please test with 'alternative = \"greater\"' and try again.")
+        ##     }
 
-        confidenceintervals <- list()
+        CIs <- list()
         for(lst in elm$coefTests)
             {
                 ## print(lst)
+                rejection <- lst$chosenTest$Rejection
+
+                ## if useTest is not NULL, set the test to find the CI manually
                 if(!is.null(useTest))
                     {
                         lst$chosenTest$'chosen Test' <- switch(useTest,
@@ -36,17 +43,16 @@ elmCI <- function(elm, alpha = 0.05, coefs = 2,
                        'Nonstandardized (OLS)' = {
                            ## cat("1\n")
                            res <- findNonstandardizedCI(upperbetabound = lst$upperbetabound,
-                                                        ## nullvalue =
-                                                        ## lst$nullvalue,
                                                         nullvalue = 0,
+                                                        rejection = rejection,
+                                                        alternative = alternative,
                                                         betahatj = lst$betahatj[1],
                                                         elm = lst$modelOLS,
                                                         alpha = alpha)$root
-                           ## cat("res: ", res, "\n")
-                           res <- ifelse(alternative == "greater", res,
-                                         lst$betahatj["OLS"] + (lst$betahatj["OLS"] - res))
-                           ## cat("\nCI bound:\n")
-                           ## return(res)
+                           ## cat("\nres: ", res, "\n")
+                           confint <- c(res, lst$betahatj["OLS"] + (lst$betahatj["OLS"] - res))
+                           ## cat("\nCI bound:\n", confint)
+                           ## return(confint)
                        },
                        '      Bernoulli (OLS)' = {
                            ## cat("2\n")
@@ -56,20 +62,21 @@ elmCI <- function(elm, alpha = 0.05, coefs = 2,
                                                   elm = lst$modelOLS,
                                                   alpha = alpha,
                                                   dispWarnings = dispWarnings)$root
-                           res <- ifelse(alternative == "greater",
-                                         res, -res)
+                           ## res <- ifelse(alternative == "greater",
+                           ##               res, -res)
+                           confint <- c(-res, res)
                        },
                        'Nonstandardized (MM)' = {
                            ## cat("3\n")
                            res <- findNonstandardizedCI(upperbetabound = lst$upperbetabound,
-                                                        ## nullvalue =
-                                                        ## lst$nullvalue,
                                                         nullvalue = 0,
+                                                        rejection = rejection,
                                                         betahatj = lst$betahatj[2],
                                                         elm = lst$modelMM,
                                                         alpha = alpha)$root
-                           res <- ifelse(alternative == "greater",
-                                         res, lst$betahatj["MM"] + (lst$betahatj["MM"] - res))
+                           ## cat("\nres: ", res, "\n")
+                           confint <- c(res, lst$betahatj["MM"] + (lst$betahatj["MM"] - res))
+                           ## cat("\nCI bound:\n", confint)
                        },
                        '      Bernoulli (MM)' = {
                            ## cat("4\n")   #
@@ -80,16 +87,26 @@ elmCI <- function(elm, alpha = 0.05, coefs = 2,
                                                   alpha = alpha,
                                                   dispWarnings = dispWarnings)$root
                            ## cat("res: ", res, "\n")
-                           res <- ifelse(alternative == "greater",
+                           confint <- ifelse(alternative == "greater",
                                          res, -res)
                            ## cat("\nCI bound:\n")
                            ## return(res)
                        })
 
-                confidenceintervals[[length(confidenceintervals) + 1L]] <- res
+                CIs[[length(CIs) + 1L]] <- list(coefname = lst$coefname,
+                                                confint = confint,
+                                                chosenTest = lst$chosenTest$'chosen Test')
             }
 
-        return(confidenceintervals)
+        method <- "Confidence Intervals for exact linear models"
+        structure(list(CI = CIs,
+                       method = method,
+                       yname = elm$yname,
+                       xname = elm$xname,
+                       n = elm$parameter$n,
+                       m = elm$parameter$m,
+                       alpha = alpha),
+                  class = "elmCI")
     }
 
 
@@ -183,11 +200,19 @@ calcBernoulliCI <- function(nullvalue, betahatj,
     }
 
 
-findNonstandardizedCI <- function(upperbetabound, nullvalue, betahatj,
+findNonstandardizedCI <- function(upperbetabound, nullvalue, rejection, alternative, betahatj,
                                   elm, alpha, iter = 0, step = 0.05 * upperbetabound)
     {
-        betainterval <- c(-upperbetabound, nullvalue)
-        ## cat(betainterval)
+        ## if(rejection == TRUE | (alternative == "less"))
+        ## if(alternative == "greater")
+        ##     {
+        ##         betainterval <- c(-nullvalue, upperbetabound)
+        ##     }
+        ## else
+        ##     {
+                betainterval <- c(-upperbetabound, upperbetabound)
+        ##     }
+        ## cat("\nbetainterval: ", betainterval)
 
         res <- try(uniroot(calcNonstandardizedCI,
                            interval = betainterval,
@@ -203,6 +228,8 @@ findNonstandardizedCI <- function(upperbetabound, nullvalue, betahatj,
                         iter <- iter + 1
                         res <- findNonstandardizedCI(upperbetabound = upperbetabound + step,
                                                      nullvalue = nullvalue,
+                                                     rejection = rejection,
+                                                     alternative = alternative,
                                                      betahatj = betahatj,
                                                      elm = elm, alpha = alpha,
                                                      iter = iter)

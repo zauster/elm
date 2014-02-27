@@ -14,7 +14,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
         ## cat(sigmasqbarOLS)
         ## cat("\nbeta_j: ", betaj)
 
-        cat("\n\nOLS: ")
+        ## cat("\n\nOLS: ")
         OLSNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                               lowerBE = rep(10^-6, 2),
                                                               sigmasqbar = sigmasqbarOLS["TypeII"],
@@ -23,7 +23,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                               tbarmin = tbarmin,
                                                               tauj_2 = tauj_2,
                                                               tauj_inf = tauj_inf)
-        cat(OLSNonstandardizedTypeII)
+        ## cat(OLSNonstandardizedTypeII)
         OLSNonstandardizedTypeII <- min(OLSNonstandardizedTypeII)
         names(OLSNonstandardizedTypeII) <- "Nonstandardized (OLS)"
 
@@ -43,7 +43,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                        Dmat = DmatMM, dvec = dvecMM, Amat = Amat,
                                        betabarj = betabarj, betaj = betaj,
                                        type = "typeII")
-        cat("\n\nMM: ")
+        ## cat("\n\nMM: ")
         MMNonstandardizedTypeII <- calcTypeIINonstandardized(wb1start = c(0.1, 0.1),
                                                              lowerBE = rep(10^-6, 2),
                                                              sigmasqbar = sigmasqbarMM["TypeII"],
@@ -52,7 +52,7 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                              tbarmin = tbarminmm,
                                                              tauj_2 = taujmm_2,
                                                              tauj_inf = taujmm_inf)
-        cat(MMNonstandardizedTypeII)
+        ## cat(MMNonstandardizedTypeII)
         MMNonstandardizedTypeII <- min(MMNonstandardizedTypeII)
         names(MMNonstandardizedTypeII) <- "Nonstandardized (MM)"
 
@@ -62,9 +62,9 @@ minTypeII <- function(betaj, X, ww, XROWS, XCOLS, ej, tau_jB,
                                                  alpha = alpha,
                                                  ds = dsmm, b = bmm,
                                                  XROWS = XROWS)$typeII
-    ## cat("\nMM Bernoulli\n")
-    ## print(unlist(MMBernoulliTypeII))
-    ##     MMBernoulliTypeII <- MMBernoulliTypeII$typeII
+        ## cat("\nMM Bernoulli\n")
+        ## print(unlist(MMBernoulliTypeII))
+        ##     MMBernoulliTypeII <- MMBernoulliTypeII$typeII
         names(MMBernoulliTypeII) <- "      Bernoulli (MM)"
 
         res <- c(OLSNonstandardizedTypeII,
