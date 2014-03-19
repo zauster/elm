@@ -126,7 +126,7 @@ testCoefficient <- function(j, Y, X, ww,
                                     dvec = dvecOLS,
                                     Amat = Amat,
                                     betabarj = betabarj,
-                                    betaj = betaj,
+                                    ## betaj = betaj,
                                     type = "typeI")
     ## cat("tauj2:", tauj_2, "\n")
     OLSNonstandardizedTests <- calcNonstandardizedTest(tauj_2 = tauj_2,
@@ -151,7 +151,7 @@ testCoefficient <- function(j, Y, X, ww,
                                    dvec = dvecMM,
                                    Amat = Amat,
                                    betabarj = betabarj,
-                                   betaj = betaj,
+                                   ## betaj = betaj,
                                    type = "typeI")
     MMNonstandardizedTests <- calcNonstandardizedTest(tauj_2 = taujmm_2,
                                                       tauj_inf = taujmm_inf,

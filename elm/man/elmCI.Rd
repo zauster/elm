@@ -7,7 +7,7 @@ Confidence intervals for exact linear models
   Computes the bounds of confidence intervals from a run of \code{elm}
 }
 \usage{
-elmCI(elm, alpha = 0.05, coefs = 2,
+elmCI(elm, conf.level = 0.95, coefs = 2,
       dispWarnings = FALSE,
       useTest = NULL)
 }
@@ -16,8 +16,8 @@ elmCI(elm, alpha = 0.05, coefs = 2,
   \item{elm}{
     test results from a previous \code{elm}-run.
 }
-\item{alpha}{
-  the confidence level of the interval is 1 - \code{alpha}
+\item{conf.level}{
+  the confidence level of the two-sided interval
 }
 \item{coefs}{
   the index of the coefficients to be tested
@@ -84,15 +84,15 @@ result.lower <- elm(Y, X, 0, 1, coefs = 2, nullvalue = 0, upperbetabound =
 ## see what the results look like
 result.lower
 ## compute lower bound for the coefficient
-elmCI(result.lower, alpha = 0.025)
+elmCI(result.lower, conf.level = 0.95)
 
 ## now upper bound:
 result.upper <- elm(Y, X, 0, 1, coefs = 2, nullvalue = 0, upperbetabound =
   NULL, alternative = "less")
 ## see what the results look like
 result.upper
-## compute upper bound for the coefficient
-elmCI(result.upper, alpha = 0.025)
+## compute bounds for the coefficient
+elmCI(result.upper, conf.level = 0.95)
 
 }
 \keyword{linear regression}

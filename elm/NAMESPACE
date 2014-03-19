@@ -4,3 +4,4 @@ export("elmCI")
 
 ## S3 Method
 S3method("print", "elm")
+S3method("print", "elmCI")

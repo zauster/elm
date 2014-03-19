@@ -13,10 +13,11 @@
 ## let user select which test to use, if not, use from nullvalue = 0
 ## make BernoulliTest output a named vector instead of list [LOW]
 
-elmCI <- function(elm, alpha = 0.025, coefs = 2,
+elmCI <- function(elm, conf.level = 0.95, coefs = 2,
                   dispWarnings = FALSE,
                   useTest = NULL)
     {
+        alpha = (1 - conf.level)/2
         alternative <- elm$parameter$alternative
         ## if(alternative == "less")
         ##     {
